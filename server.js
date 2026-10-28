@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { DatabaseSync } = require('node:sqlite');
 require('dotenv').config();
 
 const app = express();
@@ -12,33 +11,101 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Buat direktori data jika belum ada
-const dataDir = path.join(__dirname, 'data');
+// Database Adapter yang fleksibel (Node:sqlite atau Fallback JSON File)
+const dataDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+  try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
 }
 
-// Inisialisasi Database SQLite
-const db = new DatabaseSync(path.join(dataDir, 'laundry.db'));
-db.exec(`
-  CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_code TEXT UNIQUE,
-    customer_name TEXT NOT NULL,
-    customer_phone TEXT NOT NULL,
-    service_type TEXT NOT NULL,
-    estimated_weight TEXT,
-    pickup_address TEXT NOT NULL,
-    pickup_notes TEXT,
-    pickup_date TEXT NOT NULL,
-    pickup_time TEXT NOT NULL,
-    status TEXT DEFAULT 'pending',
-    fonnte_status TEXT DEFAULT 'unprocessed',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+let db = null;
+let memoryOrders = [];
+const jsonDbPath = path.join(dataDir, 'orders.json');
 
-// Helper normalisasi nomor telepon ke format Indonesia (628xxx)
+try {
+  const { DatabaseSync } = require('node:sqlite');
+  db = new DatabaseSync(path.join(dataDir, 'laundry.db'));
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_code TEXT UNIQUE,
+      customer_name TEXT NOT NULL,
+      customer_phone TEXT NOT NULL,
+      service_type TEXT NOT NULL,
+      estimated_weight TEXT,
+      pickup_address TEXT NOT NULL,
+      pickup_notes TEXT,
+      pickup_date TEXT NOT NULL,
+      pickup_time TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      fonnte_status TEXT DEFAULT 'sent',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('Database SQLite berhasil diinisialisasi.');
+} catch (err) {
+  console.warn('node:sqlite tidak tersedia, beralih ke adapter penyimpanan JSON:', err.message);
+  if (fs.existsSync(jsonDbPath)) {
+    try { memoryOrders = JSON.parse(fs.readFileSync(jsonDbPath, 'utf8')); } catch (e) { memoryOrders = []; }
+  }
+}
+
+// Helper DB
+function insertOrder(orderData) {
+  if (db) {
+    const insertStmt = db.prepare(`
+      INSERT INTO orders (
+        order_code, customer_name, customer_phone, service_type,
+        estimated_weight, pickup_address, pickup_notes, pickup_date, pickup_time,
+        status, fonnte_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'sent')
+    `);
+    insertStmt.run(
+      orderData.order_code,
+      orderData.customer_name,
+      orderData.customer_phone,
+      orderData.service_type,
+      orderData.estimated_weight,
+      orderData.pickup_address,
+      orderData.pickup_notes,
+      orderData.pickup_date,
+      orderData.pickup_time
+    );
+  } else {
+    const newOrder = {
+      id: memoryOrders.length + 1,
+      ...orderData,
+      status: 'pending',
+      fonnte_status: 'sent',
+      created_at: new Date().toISOString()
+    };
+    memoryOrders.unshift(newOrder);
+    try { fs.writeFileSync(jsonDbPath, JSON.stringify(memoryOrders, null, 2)); } catch (e) {}
+  }
+}
+
+function getAllOrders() {
+  if (db) {
+    return db.prepare('SELECT * FROM orders ORDER BY id DESC').all();
+  }
+  return memoryOrders;
+}
+
+function updateOrderStatus(id, status) {
+  if (db) {
+    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+    if (!order) return null;
+    db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, id);
+    return order;
+  } else {
+    const order = memoryOrders.find(o => o.id === Number(id));
+    if (!order) return null;
+    order.status = status;
+    try { fs.writeFileSync(jsonDbPath, JSON.stringify(memoryOrders, null, 2)); } catch (e) {}
+    return order;
+  }
+}
+
+// Normalisasi nomor telepon ke format 628xxx
 function normalizePhone(phone) {
   if (!phone) return '';
   let cleaned = phone.replace(/[^0-9]/g, '');
@@ -50,17 +117,17 @@ function normalizePhone(phone) {
   return cleaned;
 }
 
-// Helper kirim pesan WhatsApp via Fonnte API
+// Kirim pesan WhatsApp via Fonnte API
 async function sendFonnteWA(target, message) {
   const token = process.env.FONNTE_TOKEN;
   const normalizedTarget = normalizePhone(target);
 
-  if (!token || token.trim() === '' || token === 'ganti_dengan_token_fonnte_anda') {
-    console.log(`[FONNTE SIMULASI] Token belum diisi di .env. Pesan ke ${normalizedTarget}:\n${message}`);
+  if (!token || token.trim() === '' || token.includes('ganti_')) {
+    console.log(`[FONNTE SIMULASI] Pesan ke ${normalizedTarget}:\n${message}`);
     return {
       status: true,
       simulation: true,
-      message: 'Simulasi kirim WA sukses (token Fonnte belum dikonfigurasi di .env)'
+      message: 'Simulasi WA sukses (token belum diisi di env)'
     };
   }
 
@@ -80,7 +147,6 @@ async function sendFonnteWA(target, message) {
     });
 
     const data = await res.json();
-    console.log(`[FONNTE RESPONS ${normalizedTarget}]:`, data);
     return data;
   } catch (err) {
     console.error(`[FONNTE ERROR ${normalizedTarget}]:`, err.message);
@@ -88,7 +154,6 @@ async function sendFonnteWA(target, message) {
   }
 }
 
-// Generate Kode Order (Contoh: BAL-261028-001)
 function generateOrderCode() {
   const now = new Date();
   const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
@@ -96,18 +161,17 @@ function generateOrderCode() {
   return `BAL-${dateStr}-${randomSuffix}`;
 }
 
-// API: Konfigurasi Publik
+// API Endpoints
 app.get('/api/config', (req, res) => {
   res.json({
     businessName: process.env.BUSINESS_NAME || 'Budi Antik Laundry',
     businessTagline: process.env.BUSINESS_TAGLINE || 'Solusi Cuci Bersih, Wangi & Cepat di Majasem Kota Cirebon',
     businessAddress: process.env.BUSINESS_ADDRESS || 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon',
-    businessPhone: process.env.BUSINESS_PHONE || '081234567890',
-    fonnteConfigured: Boolean(process.env.FONNTE_TOKEN && process.env.FONNTE_TOKEN !== 'ganti_dengan_token_fonnte_anda')
+    businessPhone: process.env.BUSINESS_PHONE || '085962738788',
+    fonnteConfigured: Boolean(process.env.FONNTE_TOKEN && !process.env.FONNTE_TOKEN.includes('ganti_'))
   });
 });
 
-// API: Buat Order Baru
 app.post('/api/orders', async (req, res) => {
   try {
     const {
@@ -131,28 +195,18 @@ app.post('/api/orders', async (req, res) => {
     const orderCode = generateOrderCode();
     const cleanPhone = customer_phone.trim();
 
-    // Simpan ke database
-    const insertStmt = db.prepare(`
-      INSERT INTO orders (
-        order_code, customer_name, customer_phone, service_type,
-        estimated_weight, pickup_address, pickup_notes, pickup_date, pickup_time,
-        status, fonnte_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'sent')
-    `);
-
-    insertStmt.run(
-      orderCode,
-      customer_name.trim(),
-      cleanPhone,
-      service_type || 'Cuci Komplit Kiloan (Reguler)',
-      estimated_weight || 'Belum ditimbang (jemput dulu)',
-      pickup_address.trim(),
-      pickup_notes ? pickup_notes.trim() : '-',
+    insertOrder({
+      order_code: orderCode,
+      customer_name: customer_name.trim(),
+      customer_phone: cleanPhone,
+      service_type: service_type || 'Cuci Komplit Kiloan (Reguler)',
+      estimated_weight: estimated_weight || 'Belum ditimbang (jemput dulu)',
+      pickup_address: pickup_address.trim(),
+      pickup_notes: pickup_notes ? pickup_notes.trim() : '-',
       pickup_date,
       pickup_time
-    );
+    });
 
-    // Siapkan template pesan untuk Pelanggan
     const customerMsg =
 `🧺 *PESANAN DITERIMA - BUDI ANTIK LAUNDRY* 🧺
 
@@ -173,8 +227,7 @@ Kurir kami akan segera meluncur untuk mengambil cucian Anda sesuai jadwal. Mohon
 Ada pertanyaan? Hubungi kami langsung di WA ini.
 _Budi Antik Laundry: Bersih, Rapi, Harum & 1 Mesin 1 Pelanggan._`;
 
-    // Siapkan template pesan untuk Admin / Pemilik
-    const adminPhone = process.env.ADMIN_WHATSAPP;
+    const adminPhone = process.env.ADMIN_WHATSAPP || '085962738788';
     const adminMsg =
 `🚨 *ORDER JEMPUT LAUNDRY BARU MASUK!* 🚨
 
@@ -191,8 +244,7 @@ Terdapat pesanan baru dari website:
 ━━━━━━━━━━━━━━━━━━━
 Segera atur penjemputan oleh kurir!`;
 
-    // Eksekusi pengiriman WA via Fonnte secara asynchronous
-    let fonnteResultCust = await sendFonnteWA(cleanPhone, customerMsg);
+    const fonnteResultCust = await sendFonnteWA(cleanPhone, customerMsg);
     let fonnteResultAdmin = null;
     if (adminPhone && adminPhone.trim() !== '') {
       fonnteResultAdmin = await sendFonnteWA(adminPhone, adminMsg);
@@ -217,28 +269,24 @@ Segera atur penjemputan oleh kurir!`;
   }
 });
 
-// API: Ambil Semua Orders (untuk Admin)
 app.get('/api/orders', (req, res) => {
   try {
-    const orders = db.prepare('SELECT * FROM orders ORDER BY id DESC').all();
+    const orders = getAllOrders();
     res.json({ success: true, data: orders });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// API: Update Status Pesanan & Kirim Update WhatsApp ke Pelanggan
 app.patch('/api/orders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notifyCustomer } = req.body;
 
-    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+    const order = updateOrderStatus(id, status);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Pesanan tidak ditemukan' });
     }
-
-    db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, id);
 
     let waResult = null;
     if (notifyCustomer) {
@@ -273,7 +321,6 @@ Terima kasih atas kepercayaannya pada Budi Antik Laundry Majasem, Cirebon!`;
   }
 });
 
-// API: Test Kirim Pesan Fonnte
 app.post('/api/test-fonnte', async (req, res) => {
   const { target, message } = req.body;
   if (!target || !message) {
@@ -283,11 +330,15 @@ app.post('/api/test-fonnte', async (req, res) => {
   res.json({ success: true, result });
 });
 
-// Jalankan Server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`=======================================================`);
-  console.log(`✨ Budi Antik Laundry Web Server Berjalan di Port ${PORT}`);
-  console.log(`🌐 Akses Lokal: http://localhost:${PORT}`);
-  console.log(`📱 Admin Panel: http://localhost:${PORT}/admin.html`);
-  console.log(`=======================================================`);
-});
+// Jalankan Server jika bukan serverless
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`=======================================================`);
+    console.log(`✨ Budi Antik Laundry Web Server Berjalan di Port ${PORT}`);
+    console.log(`🌐 Akses Lokal: http://localhost:${PORT}`);
+    console.log(`📱 Admin Panel: http://localhost:${PORT}/admin.html`);
+    console.log(`=======================================================`);
+  });
+}
+
+module.exports = app;
