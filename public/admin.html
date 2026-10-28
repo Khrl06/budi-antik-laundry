@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Budi Antik Laundry Majasem</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brand: { 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490', 900: '#164e63' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
+
+  <!-- Navbar Admin -->
+  <header class="bg-slate-900 text-white border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white text-sm">
+          BA
+        </div>
+        <div>
+          <h1 class="font-bold text-base tracking-tight">Budi Antik Laundry • Admin Panel</h1>
+          <p class="text-xs text-slate-400">Wilayah Majasem, Kota Cirebon</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+          Lihat Website Utama ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Status Cards & Fonnte Status -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pesanan</div>
+        <div class="text-3xl font-extrabold text-slate-900 mt-2" id="statTotal">0</div>
+        <div class="text-xs text-slate-500 mt-1">Semua pesanan masuk</div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-amber-500">Menunggu Jemput</div>
+        <div class="text-3xl font-extrabold text-amber-600 mt-2" id="statPending">0</div>
+        <div class="text-xs text-slate-500 mt-1">Kurir perlu menjemput</div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-cyan-600">Proses Cuci</div>
+        <div class="text-3xl font-extrabold text-cyan-600 mt-2" id="statProcessing">0</div>
+        <div class="text-xs text-slate-500 mt-1">Sedang dicuci / disetrika</div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-emerald-600">Fonnte WhatsApp</div>
+        <div class="text-sm font-bold mt-2" id="statFonnte">Memeriksa...</div>
+        <div class="text-xs text-slate-500 mt-1" id="statFonnteDesc">Gateway Notifikasi WA</div>
+      </div>
+    </div>
+
+    <!-- Fonnte Quick Test Box -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+        <span>📲 Uji Coba Pengiriman WhatsApp via Fonnte</span>
+      </h3>
+      <p class="text-xs text-slate-500 mb-4">
+        Masukkan nomor HP tujuan untuk mengetes apakah token Fonnte di file <code>.env</code> sudah aktif dan bisa mengirimkan pesan.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input type="text" id="testPhone" placeholder="Contoh: 08xxxxxxxxxx" class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-1">
+        <input type="text" id="testMessage" placeholder="Pesan tes: Halo dari Budi Antik Laundry!" value="Halo! Ini pesan tes otomatis dari Budi Antik Laundry Majasem via Fonnte." class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-2">
+        <button onclick="testFonnte()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shrink-0">
+          Kirim Tes WA
+        </button>
+      </div>
+      <div id="testResult" class="text-xs mt-2 font-mono hidden"></div>
+    </div>
+
+    <!-- Daftar Pesanan Masuk -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Daftar Antrean & Pesanan Masuk</h2>
+          <p class="text-xs text-slate-500">Diperbarui otomatis dari database lokal</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="fetchOrders()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+            🔄 Refresh Data
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold">
+              <th class="p-4">Kode Order</th>
+              <th class="p-4">Pelanggan</th>
+              <th class="p-4">Layanan & Est</th>
+              <th class="p-4">Waktu Jemput</th>
+              <th class="p-4">Alamat Majasem</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody" class="divide-y divide-slate-100 text-slate-700">
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">Memuat data pesanan...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        const statFonnte = document.getElementById('statFonnte');
+        const statFonnteDesc = document.getElementById('statFonnteDesc');
+        if (data.fonnteConfigured) {
+          statFonnte.textContent = '✅ Terhubung';
+          statFonnte.className = 'text-sm font-bold mt-2 text-emerald-600';
+          statFonnteDesc.textContent = 'Token aktif di .env';
+        } else {
+          statFonnte.textContent = '⚠️ Mode Simulasi';
+          statFonnte.className = 'text-sm font-bold mt-2 text-amber-600';
+          statFonnteDesc.textContent = 'Token belum diisi di .env';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch('/api/orders');
+        const result = await res.json();
+        if (!result.success) return;
+
+        const orders = result.data;
+        document.getElementById('statTotal').textContent = orders.length;
+        document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
+        document.getElementById('statProcessing').textContent = orders.filter(o => o.status === 'proses_cuci' || o.status === 'dijemput').length;
+
+        const tbody = document.getElementById('ordersTableBody');
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada pesanan masuk dari website.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = orders.map(order => {
+          let statusBadge = '';
+          if (order.status === 'pending') {
+            statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full">Menunggu Jemput</span>';
+          } else if (order.status === 'dijemput') {
+            statusBadge = '<span class="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full">Sudah Dijemput</span>';
+          } else if (order.status === 'proses_cuci') {
+            statusBadge = '<span class="bg-cyan-100 text-cyan-800 font-bold px-2.5 py-1 rounded-full">Proses Cuci</span>';
+          } else if (order.status === 'selesai') {
+            statusBadge = '<span class="bg-purple-100 text-purple-800 font-bold px-2.5 py-1 rounded-full">Selesai / Siap Antar</span>';
+          } else if (order.status === 'diantar') {
+            statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Selesai Diantar</span>';
+          }
+
+          const cleanPhone = order.customer_phone.replace(/[^0-9]/g, '');
+          const waFormatted = cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone;
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-4 font-mono font-bold text-brand-700">${order.order_code}</td>
+              <td class="p-4">
+                <div class="font-bold text-slate-900">${order.customer_name}</div>
+                <a href="https://wa.me/${waFormatted}" target="_blank" class="text-[11px] text-emerald-600 hover:underline flex items-center gap-1 mt-0.5">
+                  💬 ${order.customer_phone}
+                </a>
+              </td>
+              <td class="p-4">
+                <div class="font-medium">${order.service_type}</div>
+                <div class="text-slate-400 text-[11px]">${order.estimated_weight || '-'}</div>
+              </td>
+              <td class="p-4">
+                <div>${order.pickup_date}</div>
+                <div class="text-slate-500 text-[11px]">${order.pickup_time}</div>
+              </td>
+              <td class="p-4 max-w-xs truncate" title="${order.pickup_address}">
+                ${order.pickup_address}
+                ${order.pickup_notes && order.pickup_notes !== '-' ? `<div class="text-slate-400 text-[10px] italic">Note: ${order.pickup_notes}</div>` : ''}
+              </td>
+              <td class="p-4">${statusBadge}</td>
+              <td class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
+                    <option value="" disabled selected>Ubah Status</option>
+                    <option value="dijemput">Sudah Dijemput</option>
+                    <option value="proses_cuci">Proses Cuci</option>
+                    <option value="selesai">Selesai Cuci (Siap Antar)</option>
+                    <option value="diantar">Sudah Diantar</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function updateStatus(id, newStatus) {
+      if (!confirm(`Ubah status pesanan menjadi "${newStatus}" dan kirim notifikasi WhatsApp otomatis ke pelanggan?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/orders/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus, notifyCustomer: true })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Status pesanan berhasil diperbarui & notifikasi WhatsApp dikirimkan!');
+          fetchOrders();
+        } else {
+          alert('Gagal mengubah status: ' + data.message);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan: ' + err.message);
+      }
+    }
+
+    async function testFonnte() {
+      const target = document.getElementById('testPhone').value;
+      const message = document.getElementById('testMessage').value;
+      const resultBox = document.getElementById('testResult');
+
+      if (!target) {
+        alert('Mohon masukkan nomor HP tujuan.');
+        return;
+      }
+
+      resultBox.classList.remove('hidden');
+      resultBox.textContent = 'Mengirim via Fonnte API...';
+
+      try {
+        const res = await fetch('/api/test-fonnte', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target, message })
+        });
+        const data = await res.json();
+        resultBox.textContent = JSON.stringify(data.result, null, 2);
+      } catch (err) {
+        resultBox.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    loadConfig();
+    fetchOrders();
+  </script>
+</body>
+</html>

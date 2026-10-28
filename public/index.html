@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budi Antik Laundry - Majasem Kota Cirebon | Cuci Kiloan & Satuan Antar Jemput</title>
+  <meta name="description" content="Layanan Laundry Kiloan & Satuan Bersih, Wangi, dan Higienis Antar Jemput di Majasem, Kota Cirebon. 1 Mesin 1 Pelanggan. Notifikasi WhatsApp Otomatis!">
+  
+  <!-- Google Fonts & Tailwind CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfeff',
+              100: '#cffafe',
+              200: '#a5f3fc',
+              300: '#67e8f9',
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+              700: '#0e7490',
+              800: '#155e75',
+              900: '#164e63',
+              navy: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 50%, #0f172a 100%);
+    }
+    .card-hover {
+      transition: all 0.25s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -10px rgba(8, 145, 178, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+  <!-- Promo Top Bar -->
+  <div class="bg-brand-900 text-cyan-200 text-xs sm:text-sm py-2 px-4 text-center font-medium flex items-center justify-center gap-2">
+    <span class="inline-block bg-cyan-500 text-slate-900 text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Promo</span>
+    <span>Gratis Ongkir Antar-Jemput Wilayah Majasem & Sekitarnya* | Buka Setiap Hari 07.00 - 21.00 WIB</span>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+            Budi Antik <span class="text-brand-600">Laundry</span>
+          </div>
+          <p class="text-xs font-medium text-slate-500">Majasem • Kota Cirebon</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+        <a href="#keunggulan" class="hover:text-brand-600 transition">Mengapa Kami</a>
+        <a href="#layanan" class="hover:text-brand-600 transition">Layanan & Harga</a>
+        <a href="#cara-pesan" class="hover:text-brand-600 transition">Cara Pesan</a>
+        <a href="#area" class="hover:text-brand-600 transition">Area Majasem</a>
+        <a href="/admin.html" class="text-slate-400 hover:text-slate-600 text-xs">Admin Panel</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="https://wa.me/6285962738788?text=Halo%20Budi%20Antik%20Laundry,%20saya%20mau%20tanya%20layanan%20laundry" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition">
+          <svg class="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <span>Chat WA</span>
+        </a>
+        <a href="#order-form" class="inline-flex items-center gap-2 bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md shadow-brand-500/25 hover:opacity-95 transition">
+          <span>Pesan Jemput</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative hero-gradient text-white pt-16 pb-24 overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Hero Text -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-cyan-200 text-xs sm:text-sm font-semibold">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            Layanan Antar-Jemput No. 1 di Majasem Cirebon
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            Cucian Bersih, Wangi & Rapi <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-100">Tanpa Keluar Rumah!</span>
+          </h1>
+          <p class="text-base sm:text-lg text-cyan-100/90 max-w-2xl font-normal leading-relaxed">
+            Solusi praktis warga Majasem & sekitarnya. Cukup isi form di website, notifikasi otomatis terhubung ke WhatsApp via Fonnte, dan kurir kami siap menjemput pakaian kotor Anda!
+          </p>
+
+          <!-- Badges -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+            <div class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-3 flex items-center gap-2.5">
+              <span class="text-xl">🧺</span>
+              <div class="text-xs">
+                <div class="font-bold text-white">1 Mesin 1 Klien</div>
+                <div class="text-cyan-200">Tidak dicampur</div>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-3 flex items-center gap-2.5">
+              <span class="text-xl">📲</span>
+              <div class="text-xs">
+                <div class="font-bold text-white">Notifikasi WA</div>
+                <div class="text-cyan-200">Update via Fonnte</div>
+              </div>
+            </div>
+            <div class="col-span-2 sm:col-span-1 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-3 flex items-center gap-2.5">
+              <span class="text-xl">🚚</span>
+              <div class="text-xs">
+                <div class="font-bold text-white">Antar Jemput</div>
+                <div class="text-cyan-200">Tepat waktu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-4">
+            <a href="#order-form" class="inline-flex justify-center items-center gap-2 bg-white text-slate-900 font-extrabold px-8 py-4 rounded-2xl shadow-xl hover:bg-cyan-50 transition text-base">
+              <span>Isi Form Antar-Jemput</span>
+              <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </a>
+            <a href="#layanan" class="inline-flex justify-center items-center gap-2 bg-brand-800/80 hover:bg-brand-800 text-white font-semibold px-6 py-4 rounded-2xl border border-white/20 transition text-base">
+              Lihat Daftar Harga
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Card / Mockup Box -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-2xl border border-slate-100 relative">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-100 text-brand-700 flex items-center justify-center font-bold">
+                  BA
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm">Budi Antik Quick Order</h3>
+                  <p class="text-xs text-slate-500">Majasem - Kota Cirebon</p>
+                </div>
+              </div>
+              <span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Outlet Buka
+              </span>
+            </div>
+
+            <div class="space-y-4 text-sm">
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div class="text-xs text-slate-500 font-medium mb-1">Status Penjemputan Hari Ini:</div>
+                <div class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                  <span class="text-brand-600">⚡ Kurir Standby di Area Majasem</span>
+                </div>
+                <div class="text-xs text-slate-600 mt-1">Estimasi jemput: 15 - 30 menit setelah pesanan terkonfirmasi di WhatsApp.</div>
+              </div>
+
+              <div class="space-y-2 text-xs text-slate-600">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Cuci Kiloan Reguler & Express 4 Jam</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Bed Cover, Selimut, Jas & Karpet</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Notifikasi WhatsApp otomatis via Fonnte</span>
+                </div>
+              </div>
+
+              <a href="#order-form" class="w-full mt-2 block text-center bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition shadow-md shadow-brand-600/20">
+                Pesan Jemput Sekarang
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mengapa Kami (Keunggulan ala LaundryKlin) -->
+  <section id="keunggulan" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-brand-600 mb-2">Mengapa Budi Antik Laundry</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Standar Kualitas Terbaik untuk Pakaian Anda</p>
+        <p class="text-slate-600 mt-3 text-sm sm:text-base">Kami mengedepankan kebersihan, higienitas, dan kemudahan teknologi agar mencuci pakaian jadi pengalaman tanpa repot.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Fitur 1 -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-100 card-hover text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-brand-700 flex items-center justify-center text-2xl font-bold">
+            🧺
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">1 Mesin 1 Pelanggan</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Pakaian Anda tidak pernah dicampur dengan pelanggan lain untuk menjaga privasi, higienitas, dan mencegah risiko tertukar.</p>
+        </div>
+
+        <!-- Fitur 2 -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-100 card-hover text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-brand-700 flex items-center justify-center text-2xl font-bold">
+            📲
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Notifikasi WA Otomatis</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Terhubung ke WhatsApp via Fonnte. Dapatkan bukti order, jadwal jemput, dan status cucian selesai langsung di chat Anda.</p>
+        </div>
+
+        <!-- Fitur 3 -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-100 card-hover text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-brand-700 flex items-center justify-center text-2xl font-bold">
+            🌸
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Parfum Grade Premium</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Pilihan aroma segar mewah yang tahan lama, dipadukan dengan setrika uap rapi yang menjaga serat kain tetap awet.</p>
+        </div>
+
+        <!-- Fitur 4 -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-100 card-hover text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-brand-700 flex items-center justify-center text-2xl font-bold">
+            🛵
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Antar Jemput Cirebon</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Khusus wilayah Majasem, Kesambi, Harjamukti, Karyamulya dan sekitarnya. Kurir kami siap jemput & antar kembali.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Langkah Cara Memesan (Seperti LaundryKlin) -->
+  <section id="cara-pesan" class="py-20 bg-slate-50 border-y border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-brand-600 mb-2">Sangat Praktis</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">4 Langkah Mudah Pesan Laundry</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative">
+          <div class="text-3xl font-black text-brand-500/20 mb-2">01</div>
+          <h3 class="font-bold text-slate-900 mb-2 text-base">Isi Formulir Order</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Pilih jenis layanan, masukkan alamat di Majasem, serta waktu penjemputan yang diinginkan.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative">
+          <div class="text-3xl font-black text-brand-500/20 mb-2">02</div>
+          <h3 class="font-bold text-slate-900 mb-2 text-base">Konfirmasi WhatsApp</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Sistem kami langsung mengirimkan rincian pesanan dan no. order ke WhatsApp Anda via Fonnte.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative">
+          <div class="text-3xl font-black text-brand-500/20 mb-2">03</div>
+          <h3 class="font-bold text-slate-900 mb-2 text-base">Kurir Jemput Cucian</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Kurir kami meluncur ke rumah Anda untuk menimbang cucian dan membawa pakaian ke outlet kami.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 relative">
+          <div class="text-3xl font-black text-brand-500/20 mb-2">04</div>
+          <h3 class="font-bold text-slate-900 mb-2 text-base">Diantar Bersih & Rapi</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Pakaian selesai dicuci, disetrika, dipacking rapi dan wangi, siap diantar kembali ke tempat Anda!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layanan & Daftar Harga -->
+  <section id="layanan" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-brand-600 mb-2">Pricelist Terjangkau</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Pilihan Layanan & Tarif Transparan</p>
+        <p class="text-slate-600 mt-3 text-sm sm:text-base">Harga bersahabat untuk mahasiswa, keluarga, maupun pekerja di Kota Cirebon.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Paket Kiloan Reguler -->
+        <div class="rounded-3xl border border-slate-200 p-8 card-hover flex flex-col justify-between">
+          <div>
+            <div class="inline-block bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-4">Paling Populer</div>
+            <h3 class="text-2xl font-extrabold text-slate-900">Cuci Komplit Kiloan</h3>
+            <p class="text-slate-500 text-sm mt-1">Cuci + Kering + Setrika Uap Rapi</p>
+            <div class="mt-6 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-brand-600">Rp 7.000</span>
+              <span class="text-slate-500 text-sm">/ kg</span>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+              <li class="flex items-center gap-2">✓ Estimasi selesai 2 hari kerja</li>
+              <li class="flex items-center gap-2">✓ 1 Mesin 1 Pelanggan (Higienis)</li>
+              <li class="flex items-center gap-2">✓ Pewangi premium tahan lama</li>
+              <li class="flex items-center gap-2">✓ Packing rapi per plastik rapat</li>
+            </ul>
+          </div>
+          <a href="#order-form" onclick="selectService('Cuci Komplit Kiloan (Reguler 2 Hari)')" class="mt-8 block text-center font-bold text-sm bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl transition">
+            Pilih Layanan Ini
+          </a>
+        </div>
+
+        <!-- Paket Express Kilat -->
+        <div class="rounded-3xl border-2 border-brand-500 p-8 card-hover relative flex flex-col justify-between shadow-lg shadow-brand-500/10 bg-gradient-to-b from-cyan-50/50 to-white">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">
+            Prioritas Kilat
+          </div>
+          <div>
+            <div class="inline-block bg-cyan-100 text-brand-800 text-xs font-bold px-3 py-1 rounded-full mb-4">Butuh Cepat</div>
+            <h3 class="text-2xl font-extrabold text-slate-900">Cuci Express Kilat</h3>
+            <p class="text-slate-500 text-sm mt-1">Selesai 4 - 6 Jam Langsung Bersih</p>
+            <div class="mt-6 flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-brand-600">Rp 12.000</span>
+              <span class="text-slate-500 text-sm">/ kg</span>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+              <li class="flex items-center gap-2">✓ Selesai hari yang sama (4-6 jam)</li>
+              <li class="flex items-center gap-2">✓ Prioritas penjemputan utama</li>
+              <li class="flex items-center gap-2">✓ Setrika uap presisi & parfum ekstra</li>
+              <li class="flex items-center gap-2">✓ Cocok untuk seragam & dinas mendadak</li>
+            </ul>
+          </div>
+          <a href="#order-form" onclick="selectService('Cuci Express Kilat (4-6 Jam)')" class="mt-8 block text-center font-bold text-sm bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl transition shadow-md shadow-brand-600/25">
+            Pesan Express Sekarang
+          </a>
+        </div>
+
+        <!-- Layanan Satuan & Khusus -->
+        <div class="rounded-3xl border border-slate-200 p-8 card-hover flex flex-col justify-between">
+          <div>
+            <div class="inline-block bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full mb-4">Perawatan Khusus</div>
+            <h3 class="text-2xl font-extrabold text-slate-900">Cuci Satuan Spesial</h3>
+            <p class="text-slate-500 text-sm mt-1">Bed Cover, Selimut, Jas & Karpet</p>
+            <div class="mt-6 flex items-baseline gap-1">
+              <span class="text-3xl font-extrabold text-brand-600">Mulai Rp 20rb</span>
+              <span class="text-slate-500 text-sm">/ pcs</span>
+            </div>
+            <ul class="mt-6 space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+              <li class="flex items-center gap-2">✓ Bed Cover: Rp 25.000 - 35.000</li>
+              <li class="flex items-center gap-2">✓ Selimut Tebal: Rp 20.000</li>
+              <li class="flex items-center gap-2">✓ Jas / Blazer: Rp 25.000</li>
+              <li class="flex items-center gap-2">✓ Karpet & Gorden: Rp 15.000 / m²</li>
+            </ul>
+          </div>
+          <a href="#order-form" onclick="selectService('Cuci Satuan (Bed Cover / Selimut / Jas)')" class="mt-8 block text-center font-bold text-sm bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl transition">
+            Pilih Cuci Satuan
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM ORDER ANTAR JEMPUT (TERHUBUNG KE FONNTE) -->
+  <section id="order-form" class="py-20 bg-gradient-to-b from-slate-100 to-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200/80">
+        <div class="text-center max-w-xl mx-auto mb-10">
+          <span class="inline-block bg-cyan-100 text-brand-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">Formulir Pesanan Online</span>
+          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Pesan Antar-Jemput Cucian</h2>
+          <p class="text-slate-600 mt-2 text-sm">Isi data di bawah ini. Notifikasi dan rincian pesanan otomatis terkirim langsung ke nomor WhatsApp Anda via Fonnte.</p>
+        </div>
+
+        <form id="laundryOrderForm" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Nama Pemesan -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Nama Lengkap <span class="text-rose-500">*</span></label>
+              <input type="text" id="customer_name" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition">
+            </div>
+
+            <!-- Nomor WhatsApp -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Nomor WhatsApp Aktif <span class="text-rose-500">*</span></label>
+              <input type="tel" id="customer_phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition">
+              <span class="text-[11px] text-slate-400 mt-1 block">Notifikasi invoice & jemput dikirim ke nomor ini</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Pilihan Layanan -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Pilihan Layanan <span class="text-rose-500">*</span></label>
+              <select id="service_type" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm bg-white transition">
+                <option value="Cuci Komplit Kiloan (Reguler 2 Hari)">Cuci Komplit Kiloan - Rp 7.000/kg (2 Hari)</option>
+                <option value="Cuci Express Kilat (4-6 Jam)">Cuci Express Kilat - Rp 12.000/kg (4-6 Jam)</option>
+                <option value="Cuci Kering Lipat">Cuci Kering Lipat - Rp 5.000/kg</option>
+                <option value="Setrika Uap Rapi">Setrika Saja - Rp 5.000/kg</option>
+                <option value="Cuci Satuan Bed Cover">Cuci Satuan: Bed Cover (Mulai Rp 25rb)</option>
+                <option value="Cuci Satuan Selimut/Jas/Gorden">Cuci Satuan: Selimut / Jas / Karpet</option>
+              </select>
+            </div>
+
+            <!-- Estimasi Berat / Jumlah -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Estimasi Berat / Jumlah</label>
+              <input type="text" id="estimated_weight" placeholder="Contoh: Sekitar 5 kg / 2 Bed Cover" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Tanggal Jemput -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Tanggal Penjemputan <span class="text-rose-500">*</span></label>
+              <input type="date" id="pickup_date" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition">
+            </div>
+
+            <!-- Jam Jemput -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Jam Penjemputan <span class="text-rose-500">*</span></label>
+              <select id="pickup_time" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm bg-white transition">
+                <option value="Pagi (08.00 - 11.00 WIB)">Pagi (08.00 - 11.00 WIB)</option>
+                <option value="Siang (11.00 - 14.00 WIB)">Siang (11.00 - 14.00 WIB)</option>
+                <option value="Sore (14.00 - 17.00 WIB)">Sore (14.00 - 17.00 WIB)</option>
+                <option value="Malam (17.00 - 20.00 WIB)">Malam (17.00 - 20.00 WIB)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Alamat Penjemputan -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Alamat Lengkap & Patokan di Majasem/Cirebon <span class="text-rose-500">*</span></label>
+            <textarea id="pickup_address" required rows="3" placeholder="Contoh: Jl. Majasem Indah Blok C No. 14 (Rumah pagar hitam samping Toko Sembako Bu Siti), Kel. Karyamulya, Kec. Kesambi, Cirebon" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition"></textarea>
+          </div>
+
+          <!-- Catatan Tambahan -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Catatan Khusus (Opsional)</label>
+            <input type="text" id="pickup_notes" placeholder="Contoh: Baju putih dipisah / Tolong parfum aroma lavender / hubungi sebelum jalan" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition">
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-700 hover:to-cyan-600 text-white font-extrabold py-4 px-6 rounded-2xl text-base shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
+              <span id="btnText">Kirim Pesanan & Kirim Notifikasi WhatsApp</span>
+              <svg id="btnSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+            <div class="text-center text-xs text-slate-400 mt-3 flex items-center justify-center gap-1">
+              <span>🔒 Privasi aman • Notifikasi instan terkirim melalui Fonnte WhatsApp Gateway</span>
+            </div>
+          </div>
+        </form>
+
+        <!-- Pesan Sukses / Modal Rincian -->
+        <div id="successModal" class="hidden mt-8 p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-slate-800">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 font-bold text-xl">
+              ✓
+            </div>
+            <div class="space-y-2">
+              <h4 class="text-lg font-bold text-emerald-900">Pesanan Berhasil Dikirim!</h4>
+              <p class="text-sm text-emerald-800" id="successMsgText">Notifikasi konfirmasi dan invoice pesanan sudah diproses untuk dikirim ke nomor WhatsApp Anda.</p>
+              <div class="bg-white p-4 rounded-xl border border-emerald-100 text-xs font-mono text-slate-700 space-y-1">
+                <div>No. Order: <strong class="text-brand-700" id="resOrderCode">-</strong></div>
+                <div id="resFonnteNote" class="text-slate-500 text-[11px]"></div>
+              </div>
+              <div class="pt-2 flex flex-wrap gap-3">
+                <a id="waDirectLink" href="#" target="_blank" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                  Buka Chat WhatsApp Kami
+                </a>
+                <button type="button" onclick="document.getElementById('successModal').classList.add('hidden')" class="text-xs text-slate-600 hover:text-slate-900 underline">
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Area Layanan Majasem Cirebon -->
+  <section id="area" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-6 space-y-5">
+          <span class="text-xs uppercase font-extrabold tracking-widest text-brand-600">Jangkauan Luas</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Melayani Seluruh Wilayah Majasem & Sekitarnya</h2>
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Kurir kami siap menjemput dan mengantar pakaian Anda di area perumahan, kos mahasiswa, perkantoran, dan pertokoan:
+          </p>
+
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Majasem Raya & Indah
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Kelurahan Karyamulya
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Kecamatan Kesambi
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Harjamukti & Perumnas
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Area Sunyaragi & Cipto
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span> Seluruh Kota Cirebon
+            </div>
+          </div>
+
+          <div class="p-4 bg-cyan-50 rounded-2xl border border-cyan-100 text-xs text-brand-900 flex items-center gap-3">
+            <span class="text-2xl">📍</span>
+            <div>
+              <strong>Lokasi Outlet Budi Antik Laundry:</strong><br>
+              Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon, Jawa Barat 45131.
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6">
+          <div class="bg-slate-100 rounded-3xl p-8 border border-slate-200 text-center space-y-4">
+            <div class="text-4xl">🗺️</div>
+            <h3 class="text-xl font-bold text-slate-900">Area Antar-Jemput Siap Antar</h3>
+            <p class="text-sm text-slate-600 max-w-md mx-auto">
+              Tinggal klik tombol pesan di atas atau hubungi kami via WhatsApp, kurir kami langsung bergerak ke lokasi Anda di Majasem dan sekitarnya.
+            </p>
+            <div class="pt-2">
+              <a href="#order-form" class="inline-flex items-center gap-2 bg-brand-600 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-md shadow-brand-600/20 hover:bg-brand-700 transition">
+                Order Jemput Sekarang
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-sm">
+              BA
+            </div>
+            <span class="text-white font-bold text-lg">Budi Antik Laundry</span>
+          </div>
+          <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+            Layanan cuci kiloan, satuan, bed cover, dan express di wilayah Majasem Kota Cirebon. Bersih, wangi, higienis, dan dilengkapi notifikasi WhatsApp otomatis.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3">Layanan Kami</h4>
+          <ul class="text-xs space-y-2">
+            <li>Cuci Komplit Kiloan</li>
+            <li>Cuci Express Kilat (4-6 Jam)</li>
+            <li>Cuci Kering Lipat</li>
+            <li>Setrika Uap Rapi</li>
+            <li>Cuci Bed Cover & Selimut</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3">Jam Operasional</h4>
+          <p class="text-xs leading-relaxed text-slate-300">
+            Senin - Minggu: 07.00 - 21.00 WIB<br>
+            Antar Jemput: Siap setiap hari<br>
+            Lokasi: Majasem, Kota Cirebon
+          </p>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div>&copy; 2026 Budi Antik Laundry. Seluruh hak cipta dilindungi.</div>
+        <div class="flex gap-4">
+          <a href="/admin.html" class="hover:text-slate-300">Login Admin</a>
+          <a href="#order-form" class="hover:text-slate-300">Form Pesanan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Set default pickup date to today
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('pickup_date');
+      if (dateInput) {
+        dateInput.value = today;
+        dateInput.min = today;
+      }
+    });
+
+    function selectService(serviceName) {
+      const sel = document.getElementById('service_type');
+      if (sel) {
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].text.includes(serviceName) || sel.options[i].value.includes(serviceName)) {
+            sel.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    // Handle Form Submit
+    const form = document.getElementById('laundryOrderForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const successModal = document.getElementById('successModal');
+    const resOrderCode = document.getElementById('resOrderCode');
+    const resFonnteNote = document.getElementById('resFonnteNote');
+    const waDirectLink = document.getElementById('waDirectLink');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      btnText.textContent = 'Memproses Pesanan & Kirim WA...';
+      btnSpinner.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      const payload = {
+        customer_name: document.getElementById('customer_name').value,
+        customer_phone: document.getElementById('customer_phone').value,
+        service_type: document.getElementById('service_type').value,
+        estimated_weight: document.getElementById('estimated_weight').value,
+        pickup_date: document.getElementById('pickup_date').value,
+        pickup_time: document.getElementById('pickup_time').value,
+        pickup_address: document.getElementById('pickup_address').value,
+        pickup_notes: document.getElementById('pickup_notes').value
+      };
+
+      try {
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          form.reset();
+          resOrderCode.textContent = data.orderCode;
+          
+          if (data.fonnteResult?.customer?.simulation) {
+            resFonnteNote.textContent = '(Mode Percobaan: Token Fonnte belum dipasang di .env, pesan tersimulasi sukses di server).';
+          } else {
+            resFonnteNote.textContent = 'Notifikasi resmi via Fonnte telah dikirimkan ke WhatsApp Anda.';
+          }
+
+          // Generate direct WhatsApp link
+          const waMsg = encodeURIComponent(`Halo Budi Antik Laundry Majasem, saya baru saja melakukan order di website dengan No. Order: ${data.orderCode}. Mohon dikonfirmasi.`);
+          waDirectLink.href = `https://wa.me/6285962738788?text=${waMsg}`;
+
+          successModal.classList.remove('hidden');
+          successModal.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('Gagal memproses pesanan: ' + (data.message || 'Terjadi kesalahan'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan: ' + err.message);
+      } finally {
+        btnText.textContent = 'Kirim Pesanan & Kirim Notifikasi WhatsApp';
+        btnSpinner.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
