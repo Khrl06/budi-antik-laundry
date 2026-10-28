@@ -21,6 +21,31 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
 
+  <!-- Modal Login Khusus Pemilik / Admin -->
+  <div id="loginModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-5">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-brand-700 flex items-center justify-center text-2xl font-bold shadow-md shadow-brand-500/10">
+        🔒
+      </div>
+      <div>
+        <h2 class="text-xl font-extrabold text-slate-900">Area Pemilik Laundry</h2>
+        <p class="text-xs text-slate-500 mt-1">Masukkan password admin Budi Antik Laundry untuk melihat data pesanan.</p>
+      </div>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <input type="password" id="adminPasswordInput" required placeholder="Masukkan Password Admin" class="w-full px-4 py-3 text-center tracking-widest text-base rounded-xl border border-slate-200 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition">
+          <p id="loginError" class="text-rose-500 text-xs mt-2 hidden font-semibold"></p>
+        </div>
+        <button type="submit" id="loginBtn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md shadow-brand-600/20">
+          Masuk Dashboard
+        </button>
+      </form>
+      <div class="pt-2 border-t border-slate-100">
+        <a href="/" class="text-xs text-slate-400 hover:text-slate-600">← Kembali ke Halaman Utama</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Navbar Admin -->
   <header class="bg-slate-900 text-white border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -33,10 +58,13 @@
           <p class="text-xs text-slate-400">Wilayah Majasem, Kota Cirebon</p>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-xs font-semibold">
+      <div class="flex items-center gap-3 text-xs font-semibold">
         <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
-          Lihat Website Utama ↗
+          Lihat Website ↗
         </a>
+        <button onclick="logoutAdmin()" class="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/50 transition">
+          Keluar (Kunci)
+        </button>
       </div>
     </div>
   </header>
@@ -74,11 +102,11 @@
         <span>📲 Uji Coba Pengiriman WhatsApp via Fonnte</span>
       </h3>
       <p class="text-xs text-slate-500 mb-4">
-        Masukkan nomor HP tujuan untuk mengetes apakah token Fonnte di file <code>.env</code> sudah aktif dan bisa mengirimkan pesan.
+        Ketik pesan untuk mengetes pengiriman WhatsApp melalui gateway Fonnte.
       </p>
       <div class="flex flex-col sm:flex-row gap-3">
-        <input type="text" id="testPhone" placeholder="Contoh: 08xxxxxxxxxx" class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-1">
-        <input type="text" id="testMessage" placeholder="Pesan tes: Halo dari Budi Antik Laundry!" value="Halo! Ini pesan tes otomatis dari Budi Antik Laundry Majasem via Fonnte." class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-2">
+        <input type="text" id="testPhone" placeholder="Contoh: 085962738788" class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-1">
+        <input type="text" id="testMessage" placeholder="Pesan tes" value="Halo! Ini pesan tes resmi dari Budi Antik Laundry Majasem via Fonnte." class="px-4 py-2 text-xs border border-slate-200 rounded-xl outline-none focus:border-brand-500 flex-2">
         <button onclick="testFonnte()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shrink-0">
           Kirim Tes WA
         </button>
@@ -91,7 +119,7 @@
       <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-lg font-bold text-slate-900">Daftar Antrean & Pesanan Masuk</h2>
-          <p class="text-xs text-slate-500">Diperbarui otomatis dari database lokal</p>
+          <p class="text-xs text-slate-500">Hanya dapat diakses dan diubah oleh pemilik / admin</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="fetchOrders()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
@@ -110,7 +138,7 @@
               <th class="p-4">Waktu Jemput</th>
               <th class="p-4">Alamat Majasem</th>
               <th class="p-4">Status</th>
-              <th class="p-4 text-center">Aksi</th>
+              <th class="p-4 text-center">Aksi Status</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody" class="divide-y divide-slate-100 text-slate-700">
@@ -124,6 +152,62 @@
   </main>
 
   <script>
+    function getAdminKey() {
+      return sessionStorage.getItem('bal_admin_key') || '';
+    }
+
+    function checkAuth() {
+      const key = getAdminKey();
+      const modal = document.getElementById('loginModal');
+      if (!key) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+        loadConfig();
+        fetchOrders();
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pwd = document.getElementById('adminPasswordInput').value;
+      const errorEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+
+      btn.textContent = 'Memeriksa...';
+      btn.disabled = true;
+      errorEl.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        });
+        const data = await res.json();
+        if (data.success) {
+          sessionStorage.setItem('bal_admin_key', data.token);
+          document.getElementById('loginModal').classList.add('hidden');
+          loadConfig();
+          fetchOrders();
+        } else {
+          errorEl.textContent = data.message || 'Password salah!';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errorEl.textContent = 'Kesalahan jaringan: ' + err.message;
+        errorEl.classList.remove('hidden');
+      } finally {
+        btn.textContent = 'Masuk Dashboard';
+        btn.disabled = false;
+      }
+    });
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('bal_admin_key');
+      location.reload();
+    }
+
     async function loadConfig() {
       try {
         const res = await fetch('/api/config');
@@ -133,11 +217,11 @@
         if (data.fonnteConfigured) {
           statFonnte.textContent = '✅ Terhubung';
           statFonnte.className = 'text-sm font-bold mt-2 text-emerald-600';
-          statFonnteDesc.textContent = 'Token aktif di .env';
+          statFonnteDesc.textContent = 'Token aktif';
         } else {
-          statFonnte.textContent = '⚠️ Mode Simulasi';
+          statFonnte.textContent = '⚠️ Belum Aktif';
           statFonnte.className = 'text-sm font-bold mt-2 text-amber-600';
-          statFonnteDesc.textContent = 'Token belum diisi di .env';
+          statFonnteDesc.textContent = 'Token Fonnte belum dipasang';
         }
       } catch (err) {
         console.error(err);
@@ -145,8 +229,17 @@
     }
 
     async function fetchOrders() {
+      const key = getAdminKey();
+      if (!key) return;
+
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/orders', {
+          headers: { 'x-admin-key': key }
+        });
+        if (res.status === 401) {
+          logoutAdmin();
+          return;
+        }
         const result = await res.json();
         if (!result.success) return;
 
@@ -201,15 +294,13 @@
               </td>
               <td class="p-4">${statusBadge}</td>
               <td class="p-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
-                    <option value="" disabled selected>Ubah Status</option>
-                    <option value="dijemput">Sudah Dijemput</option>
-                    <option value="proses_cuci">Proses Cuci</option>
-                    <option value="selesai">Selesai Cuci (Siap Antar)</option>
-                    <option value="diantar">Sudah Diantar</option>
-                  </select>
-                </div>
+                <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
+                  <option value="" disabled selected>Ubah Status</option>
+                  <option value="dijemput">Sudah Dijemput</option>
+                  <option value="proses_cuci">Proses Cuci</option>
+                  <option value="selesai">Selesai Cuci (Siap Antar)</option>
+                  <option value="diantar">Sudah Diantar</option>
+                </select>
               </td>
             </tr>
           `;
@@ -221,6 +312,7 @@
     }
 
     async function updateStatus(id, newStatus) {
+      const key = getAdminKey();
       if (!confirm(`Ubah status pesanan menjadi "${newStatus}" dan kirim notifikasi WhatsApp otomatis ke pelanggan?`)) {
         return;
       }
@@ -228,7 +320,10 @@
       try {
         const res = await fetch(`/api/orders/${id}/status`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-admin-key': key
+          },
           body: JSON.stringify({ status: newStatus, notifyCustomer: true })
         });
         const data = await res.json();
@@ -244,6 +339,7 @@
     }
 
     async function testFonnte() {
+      const key = getAdminKey();
       const target = document.getElementById('testPhone').value;
       const message = document.getElementById('testMessage').value;
       const resultBox = document.getElementById('testResult');
@@ -259,7 +355,10 @@
       try {
         const res = await fetch('/api/test-fonnte', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-admin-key': key
+          },
           body: JSON.stringify({ target, message })
         });
         const data = await res.json();
@@ -269,8 +368,7 @@
       }
     }
 
-    loadConfig();
-    fetchOrders();
+    checkAuth();
   </script>
 </body>
 </html>

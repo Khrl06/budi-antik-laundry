@@ -269,7 +269,25 @@ Segera atur penjemputan oleh kurir!`;
   }
 });
 
-app.get('/api/orders', (req, res) => {
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'budiantik123';
+
+function checkAdminAuth(req, res, next) {
+  const token = req.headers['x-admin-key'] || req.query.key;
+  if (!token || token !== ADMIN_PASSWORD) {
+    return res.status(401).json({ success: false, message: 'Akses ditolak: Password admin salah atau belum dimasukkan' });
+  }
+  next();
+}
+
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    return res.json({ success: true, token: ADMIN_PASSWORD });
+  }
+  res.status(401).json({ success: false, message: 'Password salah!' });
+});
+
+app.get('/api/orders', checkAdminAuth, (req, res) => {
   try {
     const orders = getAllOrders();
     res.json({ success: true, data: orders });
@@ -278,7 +296,7 @@ app.get('/api/orders', (req, res) => {
   }
 });
 
-app.patch('/api/orders/:id/status', async (req, res) => {
+app.patch('/api/orders/:id/status', checkAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notifyCustomer } = req.body;
@@ -321,7 +339,7 @@ Terima kasih atas kepercayaannya pada Budi Antik Laundry Majasem, Cirebon!`;
   }
 });
 
-app.post('/api/test-fonnte', async (req, res) => {
+app.post('/api/test-fonnte', checkAdminAuth, async (req, res) => {
   const { target, message } = req.body;
   if (!target || !message) {
     return res.status(400).json({ success: false, message: 'Target dan message wajib diisi.' });
