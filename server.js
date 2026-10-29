@@ -11,48 +11,103 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database Adapter yang fleksibel (Node:sqlite atau Fallback JSON File)
+// Inisialisasi Database: Prioritaskan Neon Postgres (Vercel) jika ada env DATABASE_URL / POSTGRES_URL
+const postgresUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL;
+let neonSql = null;
+
+if (postgresUrl) {
+  try {
+    const { neon } = require('@neondatabase/serverless');
+    neonSql = neon(postgresUrl);
+    console.log('Neon PostgreSQL berhasil terhubung!');
+  } catch (err) {
+    console.error('Gagal menghubungkan Neon PostgreSQL:', err.message);
+  }
+}
+
+// Fallback SQLite lokal jika bukan di serverless
+let sqliteDb = null;
+let memoryOrders = [];
 const dataDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
   try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
 }
-
-let db = null;
-let memoryOrders = [];
 const jsonDbPath = path.join(dataDir, 'orders.json');
 
-try {
-  const { DatabaseSync } = require('node:sqlite');
-  db = new DatabaseSync(path.join(dataDir, 'laundry.db'));
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_code TEXT UNIQUE,
-      customer_name TEXT NOT NULL,
-      customer_phone TEXT NOT NULL,
-      service_type TEXT NOT NULL,
-      estimated_weight TEXT,
-      pickup_address TEXT NOT NULL,
-      pickup_notes TEXT,
-      pickup_date TEXT NOT NULL,
-      pickup_time TEXT NOT NULL,
-      status TEXT DEFAULT 'pending',
-      fonnte_status TEXT DEFAULT 'sent',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-  console.log('Database SQLite berhasil diinisialisasi.');
-} catch (err) {
-  console.warn('node:sqlite tidak tersedia, beralih ke adapter penyimpanan JSON:', err.message);
-  if (fs.existsSync(jsonDbPath)) {
-    try { memoryOrders = JSON.parse(fs.readFileSync(jsonDbPath, 'utf8')); } catch (e) { memoryOrders = []; }
+if (!neonSql) {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    sqliteDb = new DatabaseSync(path.join(dataDir, 'laundry.db'));
+    sqliteDb.exec(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_code TEXT UNIQUE,
+        customer_name TEXT NOT NULL,
+        customer_phone TEXT NOT NULL,
+        service_type TEXT NOT NULL,
+        estimated_weight TEXT,
+        pickup_address TEXT NOT NULL,
+        pickup_notes TEXT,
+        pickup_date TEXT NOT NULL,
+        pickup_time TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        fonnte_status TEXT DEFAULT 'sent',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+  } catch (err) {
+    if (fs.existsSync(jsonDbPath)) {
+      try { memoryOrders = JSON.parse(fs.readFileSync(jsonDbPath, 'utf8')); } catch (e) { memoryOrders = []; }
+    }
   }
 }
 
-// Helper DB
-function insertOrder(orderData) {
-  if (db) {
-    const insertStmt = db.prepare(`
+// Inisialisasi tabel di Neon jika belum ada
+let tableChecked = false;
+async function ensureNeonTable() {
+  if (!neonSql || tableChecked) return;
+  try {
+    await neonSql`
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        order_code VARCHAR(50) UNIQUE,
+        customer_name VARCHAR(255) NOT NULL,
+        customer_phone VARCHAR(50) NOT NULL,
+        service_type VARCHAR(100) NOT NULL,
+        estimated_weight VARCHAR(100),
+        pickup_address TEXT NOT NULL,
+        pickup_notes TEXT,
+        pickup_date VARCHAR(50) NOT NULL,
+        pickup_time VARCHAR(50) NOT NULL,
+        status VARCHAR(50) DEFAULT 'pending',
+        fonnte_status VARCHAR(50) DEFAULT 'sent',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    tableChecked = true;
+  } catch (err) {
+    console.error('Error saat membuat tabel Neon:', err.message);
+  }
+}
+
+// Helper DB (Mendukung Neon Async & SQLite)
+async function insertOrder(orderData) {
+  if (neonSql) {
+    await ensureNeonTable();
+    await neonSql`
+      INSERT INTO orders (
+        order_code, customer_name, customer_phone, service_type,
+        estimated_weight, pickup_address, pickup_notes, pickup_date, pickup_time,
+        status, fonnte_status
+      ) VALUES (
+        ${orderData.order_code}, ${orderData.customer_name}, ${orderData.customer_phone},
+        ${orderData.service_type}, ${orderData.estimated_weight}, ${orderData.pickup_address},
+        ${orderData.pickup_notes}, ${orderData.pickup_date}, ${orderData.pickup_time},
+        'pending', 'sent'
+      )
+    `;
+  } else if (sqliteDb) {
+    const insertStmt = sqliteDb.prepare(`
       INSERT INTO orders (
         order_code, customer_name, customer_phone, service_type,
         estimated_weight, pickup_address, pickup_notes, pickup_date, pickup_time,
@@ -83,18 +138,28 @@ function insertOrder(orderData) {
   }
 }
 
-function getAllOrders() {
-  if (db) {
-    return db.prepare('SELECT * FROM orders ORDER BY id DESC').all();
+async function getAllOrders() {
+  if (neonSql) {
+    await ensureNeonTable();
+    const rows = await neonSql`SELECT * FROM orders ORDER BY id DESC`;
+    return rows;
+  } else if (sqliteDb) {
+    return sqliteDb.prepare('SELECT * FROM orders ORDER BY id DESC').all();
   }
   return memoryOrders;
 }
 
-function updateOrderStatus(id, status) {
-  if (db) {
-    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+async function updateOrderStatus(id, status) {
+  if (neonSql) {
+    await ensureNeonTable();
+    const rows = await neonSql`SELECT * FROM orders WHERE id = ${id}`;
+    if (!rows || rows.length === 0) return null;
+    await neonSql`UPDATE orders SET status = ${status} WHERE id = ${id}`;
+    return rows[0];
+  } else if (sqliteDb) {
+    const order = sqliteDb.prepare('SELECT * FROM orders WHERE id = ?').get(id);
     if (!order) return null;
-    db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, id);
+    sqliteDb.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, id);
     return order;
   } else {
     const order = memoryOrders.find(o => o.id === Number(id));
@@ -105,7 +170,7 @@ function updateOrderStatus(id, status) {
   }
 }
 
-// Normalisasi nomor telepon ke format 628xxx
+// Normalisasi nomor telepon
 function normalizePhone(phone) {
   if (!phone) return '';
   let cleaned = phone.replace(/[^0-9]/g, '');
@@ -168,7 +233,8 @@ app.get('/api/config', (req, res) => {
     businessTagline: process.env.BUSINESS_TAGLINE || 'Solusi Cuci Bersih, Wangi & Cepat di Majasem Kota Cirebon',
     businessAddress: process.env.BUSINESS_ADDRESS || 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon',
     businessPhone: process.env.BUSINESS_PHONE || '085962738788',
-    fonnteConfigured: Boolean(process.env.FONNTE_TOKEN && !process.env.FONNTE_TOKEN.includes('ganti_'))
+    fonnteConfigured: Boolean(process.env.FONNTE_TOKEN && !process.env.FONNTE_TOKEN.includes('ganti_')),
+    databaseType: neonSql ? 'Neon PostgreSQL (Permanent Cloud)' : 'Local File Adapter'
   });
 });
 
@@ -195,7 +261,7 @@ app.post('/api/orders', async (req, res) => {
     const orderCode = generateOrderCode();
     const cleanPhone = customer_phone.trim();
 
-    insertOrder({
+    await insertOrder({
       order_code: orderCode,
       customer_name: customer_name.trim(),
       customer_phone: cleanPhone,
@@ -287,9 +353,9 @@ app.post('/api/admin/login', (req, res) => {
   res.status(401).json({ success: false, message: 'Password salah!' });
 });
 
-app.get('/api/orders', checkAdminAuth, (req, res) => {
+app.get('/api/orders', checkAdminAuth, async (req, res) => {
   try {
-    const orders = getAllOrders();
+    const orders = await getAllOrders();
     res.json({ success: true, data: orders });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -301,7 +367,7 @@ app.patch('/api/orders/:id/status', checkAdminAuth, async (req, res) => {
     const { id } = req.params;
     const { status, notifyCustomer } = req.body;
 
-    const order = updateOrderStatus(id, status);
+    const order = await updateOrderStatus(id, status);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Pesanan tidak ditemukan' });
     }
