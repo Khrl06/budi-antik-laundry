@@ -1,0 +1,119 @@
+{
+  "slide_size": "16:9",
+  "slides": [
+    {
+      "layout": "title",
+      "title": "Budi Antik Laundry",
+      "subtitle": "Profil Usaha & Layanan Laundry Modern Berbasis Web & WhatsApp Otomatis\nWilayah Majasem, Kota Cirebon | https://budi-antik-laundry.vercel.app",
+      "notes": "Slide pembuka profil usaha Budi Antik Laundry Majasem Kota Cirebon."
+    },
+    {
+      "layout": "title_content",
+      "title": "Tentang Budi Antik Laundry",
+      "bullets": [
+        {"text": "Profil Usaha:", "bold": true, "size": 20, "color": "0891B2"},
+        {"text": "Budi Antik Laundry adalah penyedia jasa cuci kiloan dan satuan modern yang berfokus pada kualitas kebersihan, kenyamanan pelanggan, dan kecepatan penjemputan.", "level": 1, "size": 16},
+        {"text": "Lokus Operasional:", "bold": true, "size": 20, "color": "0891B2"},
+        {"text": "Berlokasi di Jl. Majasem Raya, Kelurahan Karyamulya, Kecamatan Kesambi, Kota Cirebon.", "level": 1, "size": 16},
+        {"text": "Visi & Misi:", "bold": true, "size": 20, "color": "0891B2"},
+        {"text": "Menjadi solusi laundry terpercaya nomor 1 bagi keluarga, mahasiswa, dan profesional di Cirebon dengan standar higienis tinggi tanpa repot keluar rumah.", "level": 1, "size": 16}
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Menjelaskan identitas usaha, locus wilayah di Majasem Karyamulya Kesambi Cirebon, serta visi pelayanan."
+    },
+    {
+      "layout": "title_content",
+      "title": "4 Keunggulan Utama",
+      "bullets": [
+        {"text": "1. Prinsip 1 Mesin 1 Pelanggan (Higienis):", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Pakaian tiap pelanggan dicuci terpisah tanpa pernah dicampur. Privasi terjaga, lebih higienis, dan bebas risiko tertukar.", "level": 1, "size": 15},
+        {"text": "2. Otomasi WhatsApp Gateway via Fonnte:", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Invoice, konfirmasi penjemputan, dan update status cuci otomatis masuk ke WhatsApp pelanggan dan admin secara real-time.", "level": 1, "size": 15},
+        {"text": "3. Formula Parfum Premium & Setrika Uap:", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Aroma segar mewah tahan lama serta setrika uap presisi yang merawat serat pakaian agar tidak cepat rusak.", "level": 1, "size": 15},
+        {"text": "4. Layanan Antar-Jemput Siaga Majasem:", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Kurir standby menjemput langsung ke rumah, kos, kantor, atau tempat usaha Anda sesuai jadwal yang dipilih.", "level": 1, "size": 15}
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Pilar pembeda Budi Antik Laundry dibanding kompetitor konvensional."
+    },
+    {
+      "layout": "title_only",
+      "title": "Daftar Layanan & Tarif Transparan",
+      "tables": [
+        {
+          "left": 0.8,
+          "top": 1.8,
+          "width": 11.7,
+          "height": 4.5,
+          "rows": [
+            ["Jenis Layanan", "Tarif", "Estimasi Waktu", "Fasilitas & Keunggulan"],
+            ["Cuci Komplit Kiloan (Reguler)", "Rp 7.000 / kg", "2 Hari Kerja", "Cuci bersih, kering tuntas, setrika uap rapi, parfum premium, packing rapat"],
+            ["Cuci Express Kilat", "Rp 12.000 / kg", "4 - 6 Jam", "Prioritas utama selesai hari yang sama, cocok untuk kebutuhan seragam mendadak"],
+            ["Cuci Kering Lipat", "Rp 5.000 / kg", "1 - 2 Hari", "Pakaian dicuci wangi dan dilipat rapi tanpa disetrika"],
+            ["Setrika Uap Presisi", "Rp 5.000 / kg", "1 Hari", "Khusus pakaian yang sudah dicuci sendiri, disetrika halus dan wangi"],
+            ["Cuci Satuan Bed Cover", "Mulai Rp 25.000", "2 - 3 Hari", "Pencucian khusus ukuran Single, Queen, hingga King dengan deterjen lembut"],
+            ["Cuci Satuan Khusus", "Mulai Rp 20.000", "2 - 3 Hari", "Perawatan profesional untuk selimut tebal, jas/blazer, karpet, dan gorden"]
+          ]
+        }
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Pricelist lengkap layanan kiloan dan satuan."
+    },
+    {
+      "layout": "title_content",
+      "title": "Alur Pemesanan Online (4 Langkah Mudah)",
+      "bullets": [
+        {"text": "Langkah 1 — Akses Form Pemesanan di Website:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Buka link https://budi-antik-laundry.vercel.app lalu isi nama, nomor WA, alamat di Majasem, pilihan layanan, dan jadwal jemput.", "level": 1, "size": 15},
+        {"text": "Langkah 2 — Konfirmasi & Invoice WhatsApp Instan:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Sistem otomatis membuat No. Order (misal: BAL-261029-xxx) dan mengirimkan rincian nota langsung ke WhatsApp pelanggan & admin via Fonnte.", "level": 1, "size": 15},
+        {"text": "Langkah 3 — Kurir Menjemput Cucian:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Kurir tiba di lokasi pelanggan sesuai jam yang ditentukan, menimbang cucian di tempat, dan membawanya ke outlet.", "level": 1, "size": 15},
+        {"text": "Langkah 4 — Pengantaran Kembali Bersih & Rapi:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Setelah selesai diproses, pelanggan mendapat notifikasi WA dan pakaian diantar kembali dalam kondisi wangi dan rapi.", "level": 1, "size": 15}
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Alur customer journey dari form website hingga pengantaran pakaian."
+    },
+    {
+      "layout": "title_content",
+      "title": "Arsitektur Teknologi Digital",
+      "bullets": [
+        {"text": "1. Cloud Hosting 24 Jam (Vercel):", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Aplikasi web selalu aktif secara global tanpa bergantung pada perangkat lokal pengguna. Cepat, aman (HTTPS), dan responsif di smartphone.", "level": 1, "size": 15},
+        {"text": "2. Database Cloud Permanen (Neon PostgreSQL):", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Data transaksi, identitas pemesan, riwayat order, dan status penjemputan tersimpan permanen di cloud database kelas enterprise.", "level": 1, "size": 15},
+        {"text": "3. Fonnte WhatsApp API Gateway:", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Menghubungkan sistem web langsung ke WhatsApp tanpa campur tangan manual untuk mengirimkan invoice dan alert pesanan baru.", "level": 1, "size": 15},
+        {"text": "4. Protected Admin Dashboard (/admin.html):", "bold": true, "size": 18, "color": "0E7490"},
+        {"text": "Panel manajemen terproteksi password khusus pemilik untuk mengelola status cucian (Dijemput -> Proses Cuci -> Selesai -> Diantar).", "level": 1, "size": 15}
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Inovasi digital yang mendukung efisiensi operasional Budi Antik Laundry."
+    },
+    {
+      "layout": "title_content",
+      "title": "Jangkauan Area, Kontak & Informasi Operasional",
+      "bullets": [
+        {"text": "Area Layanan Antar-Jemput:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Majasem Raya & Indah, Kel. Karyamulya, Kec. Kesambi, Harjamukti, Perumnas, Sunyaragi, Cipto, dan sekitarnya (Kota Cirebon).", "level": 1, "size": 15},
+        {"text": "Jam Operasional:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Buka Setiap Hari (Senin - Minggu) pukul 07.00 - 21.00 WIB. Antar-jemput standby setiap hari.", "level": 1, "size": 15},
+        {"text": "Akses Pemesanan & Kontak Resmi:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "Website Resmi: https://budi-antik-laundry.vercel.app", "level": 1, "size": 15},
+        {"text": "Hotline WhatsApp: 085962738788", "level": 1, "size": 15},
+        {"text": "Slogan:", "bold": true, "size": 18, "color": "0891B2"},
+        {"text": "\"Solusi Cuci Bersih, Wangi & Cepat di Majasem Kota Cirebon — 1 Mesin 1 Pelanggan.\"", "level": 1, "size": 15, "italic": true}
+      ],
+      "footer": "Budi Antik Laundry • Majasem Kota Cirebon",
+      "slide_number": true,
+      "notes": "Slide penutup berisi area operasional, kontak, dan tagline."
+    }
+  ]
+}
