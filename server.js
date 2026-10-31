@@ -149,6 +149,35 @@ async function getAllOrders() {
   return memoryOrders;
 }
 
+async function findOrderByCodeOrPhone(query) {
+  if (!query) return null;
+  const qClean = query.trim().toUpperCase();
+  const qPhone = normalizePhone(query);
+
+  if (neonSql) {
+    await ensureNeonTable();
+    const rows = await neonSql`
+      SELECT * FROM orders 
+      WHERE UPPER(order_code) = ${qClean} 
+         OR customer_phone LIKE ${'%' + query.trim() + '%'}
+      ORDER BY id DESC LIMIT 5
+    `;
+    return rows;
+  } else if (sqliteDb) {
+    return sqliteDb.prepare(`
+      SELECT * FROM orders 
+      WHERE UPPER(order_code) = ? 
+         OR customer_phone LIKE ?
+      ORDER BY id DESC LIMIT 5
+    `).all(qClean, `%${query.trim()}%`);
+  } else {
+    return memoryOrders.filter(o => 
+      (o.order_code && o.order_code.toUpperCase() === qClean) || 
+      (o.customer_phone && o.customer_phone.includes(query.trim()))
+    ).slice(0, 5);
+  }
+}
+
 async function updateOrderStatus(id, status) {
   if (neonSql) {
     await ensureNeonTable();
@@ -234,8 +263,33 @@ app.get('/api/config', (req, res) => {
     businessAddress: process.env.BUSINESS_ADDRESS || 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon',
     businessPhone: process.env.BUSINESS_PHONE || '085962738788',
     fonnteConfigured: Boolean(process.env.FONNTE_TOKEN && !process.env.FONNTE_TOKEN.includes('ganti_')),
-    databaseType: neonSql ? 'Neon PostgreSQL (Permanent Cloud)' : 'Local File Adapter'
+    databaseType: neonSql ? 'Neon PostgreSQL (Permanent Cloud)' : 'Local File Adapter',
+    pricing: {
+      reguler_komplit: 7000,
+      express_kilat: 12000,
+      kering_lipat: 5000,
+      setrika_saja: 5000,
+      bed_cover: 25000,
+      selimut: 20000
+    }
   });
+});
+
+// Endpoint Tracking Pesanan Publik
+app.get('/api/orders/track', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Masukkan nomor resi atau nomor WhatsApp.' });
+    }
+    const results = await findOrderByCodeOrPhone(q);
+    if (!results || results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Pesanan tidak ditemukan. Pastikan nomor resi atau nomor HP benar.' });
+    }
+    res.json({ success: true, data: results });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/api/orders', async (req, res) => {

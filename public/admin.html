@@ -122,6 +122,9 @@
           <p class="text-xs text-slate-500">Hanya dapat diakses dan diubah oleh pemilik / admin</p>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="exportOrdersToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl transition flex items-center gap-1.5">
+            📥 Export CSV / Excel
+          </button>
           <button onclick="fetchOrders()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
             🔄 Refresh Data
           </button>
@@ -254,6 +257,7 @@
           return;
         }
 
+        window.currentLoadedOrders = orders;
         tbody.innerHTML = orders.map(order => {
           let statusBadge = '';
           if (order.status === 'pending') {
@@ -294,13 +298,18 @@
               </td>
               <td class="p-4">${statusBadge}</td>
               <td class="p-4 text-center">
-                <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
-                  <option value="" disabled selected>Ubah Status</option>
-                  <option value="dijemput">Sudah Dijemput</option>
-                  <option value="proses_cuci">Proses Cuci</option>
-                  <option value="selesai">Selesai Cuci (Siap Antar)</option>
-                  <option value="diantar">Sudah Diantar</option>
-                </select>
+                <div class="flex items-center justify-center gap-1.5">
+                  <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
+                    <option value="" disabled selected>Ubah Status</option>
+                    <option value="dijemput">Sudah Dijemput</option>
+                    <option value="proses_cuci">Proses Cuci</option>
+                    <option value="selesai">Selesai Cuci (Siap Antar)</option>
+                    <option value="diantar">Sudah Diantar</option>
+                  </select>
+                  <button onclick="printThermalReceipt(${order.id})" title="Cetak Nota Resi Struk" class="p-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700">
+                    🖨️
+                  </button>
+                </div>
               </td>
             </tr>
           `;
@@ -366,6 +375,93 @@
       } catch (err) {
         resultBox.textContent = 'Error: ' + err.message;
       }
+    }
+
+    // ===== FITUR BARU: EXPORT REKAP PESANAN KE FILE CSV / EXCEL =====
+    function exportOrdersToCSV() {
+      const orders = window.currentLoadedOrders || [];
+      if (orders.length === 0) {
+        alert('Tidak ada data pesanan untuk diekspor.');
+        return;
+      }
+
+      const headers = ['ID', 'Kode Order', 'Nama Pelanggan', 'No WhatsApp', 'Layanan', 'Estimasi Berat', 'Tgl Jemput', 'Jam Jemput', 'Alamat Majasem', 'Catatan', 'Status'];
+      const csvRows = [headers.join(',')];
+
+      orders.forEach(o => {
+        const row = [
+          o.id,
+          `"${o.order_code || ''}"`,
+          `"${(o.customer_name || '').replace(/"/g, '""')}"`,
+          `"'${o.customer_phone || ''}"`,
+          `"${(o.service_type || '').replace(/"/g, '""')}"`,
+          `"${o.estimated_weight || ''}"`,
+          `"${o.pickup_date || ''}"`,
+          `"${o.pickup_time || ''}"`,
+          `"${(o.pickup_address || '').replace(/"/g, '""')}"`,
+          `"${(o.pickup_notes || '').replace(/"/g, '""')}"`,
+          `"${o.status || ''}"`
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csvRows.join('\n'));
+      const link = document.createElement('a');
+      link.setAttribute('href', csvContent);
+      link.setAttribute('download', `Laporan_Budi_Antik_Laundry_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // ===== FITUR BARU: CETAK STRUK RESI KASIR THERMAL =====
+    function printThermalReceipt(orderId) {
+      const orders = window.currentLoadedOrders || [];
+      const order = orders.find(o => o.id == orderId);
+      if (!order) {
+        alert('Data pesanan tidak ditemukan.');
+        return;
+      }
+
+      const printWin = window.open('', '', 'width=400,height=600');
+      printWin.document.write(`
+        <html>
+        <head>
+          <title>Struk Resi - ${order.order_code}</title>
+          <style>
+            body { font-family: monospace; font-size: 12px; margin: 0; padding: 15px; color: #000; }
+            .text-center { text-align: center; }
+            .line { border-top: 1px dashed #000; margin: 8px 0; }
+            .flex-between { display: flex; justify-content: space-between; }
+            .font-bold { font-weight: bold; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="text-center font-bold" style="font-size: 14px;">BUDI ANTIK LAUNDRY</div>
+          <div class="text-center">Jl. Majasem Perjuangan, Kota Cirebon</div>
+          <div class="text-center">WA: 0859-6273-8788</div>
+          <div class="line"></div>
+          <div class="flex-between"><span>No Resi:</span><span class="font-bold">${order.order_code}</span></div>
+          <div class="flex-between"><span>Pelanggan:</span><span>${order.customer_name}</span></div>
+          <div class="flex-between"><span>No Telp:</span><span>${order.customer_phone}</span></div>
+          <div class="flex-between"><span>Tgl Jemput:</span><span>${order.pickup_date} (${order.pickup_time})</span></div>
+          <div class="line"></div>
+          <div class="flex-between"><span>Layanan:</span><span>${order.service_type}</span></div>
+          <div class="flex-between"><span>Berat/Est:</span><span>${order.estimated_weight || '-'}</span></div>
+          <div class="flex-between font-bold"><span>Status:</span><span>${(order.status || '').toUpperCase()}</span></div>
+          <div class="line"></div>
+          <div><strong>Alamat:</strong> ${order.pickup_address}</div>
+          ${order.pickup_notes ? `<div><strong>Catatan:</strong> ${order.pickup_notes}</div>` : ''}
+          <div class="line"></div>
+          <div class="text-center" style="font-size: 11px;">
+            Lacak status cucian di:<br/>
+            <strong>budi-antik-laundry.vercel.app</strong>
+          </div>
+          <div class="text-center" style="margin-top: 10px;">-- Terima Kasih --</div>
+        </body>
+        </html>
+      `);
+      printWin.document.close();
     }
 
     checkAuth();

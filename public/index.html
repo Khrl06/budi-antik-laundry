@@ -81,6 +81,14 @@
       <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
         <a href="#keunggulan" class="hover:text-brand-600 transition">Mengapa Kami</a>
         <a href="#layanan" class="hover:text-brand-600 transition">Layanan & Harga</a>
+        <a href="#kalkulator" class="hover:text-brand-600 transition text-brand-600 font-bold flex items-center gap-1">
+          <span>Hitung Biaya</span>
+          <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full uppercase">Estimasi</span>
+        </a>
+        <a href="#tracking-section" class="hover:text-brand-600 transition font-bold flex items-center gap-1">
+          <span>Lacak Resi</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        </a>
         <a href="#cara-pesan" class="hover:text-brand-600 transition">Cara Pesan</a>
         <a href="#area" class="hover:text-brand-600 transition">Area Majasem</a>
 
@@ -88,6 +96,10 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-3">
+        <a href="#tracking-section" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-brand-200 text-brand-700 bg-brand-50 hover:bg-brand-100 font-bold text-xs sm:text-sm transition">
+          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <span>Lacak Resi</span>
+        </a>
         <a href="https://wa.me/6285962738788?text=Halo%20Budi%20Antik%20Laundry,%20saya%20mau%20tanya%20layanan%20laundry" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition">
           <svg class="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
           <span>Chat WA</span>
@@ -372,6 +384,114 @@
             Pilih Cuci Satuan
           </a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIDGET KALKULATOR ESTIMASI HARGA INTERAKTIF (BARU) -->
+  <section id="kalkulator" class="py-16 bg-slate-100/70 border-y border-slate-200/80">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-lg border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-100 text-brand-800 text-xs font-bold uppercase tracking-wider mb-2">
+              <span>⚡</span> Fitur Cerdas
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight">Kalkulator Estimasi Biaya Laundry</h3>
+            <p class="text-sm text-slate-500">Hitung perkiraan biaya cucian Anda secara transparan sebelum memesan.</p>
+          </div>
+          <div class="hidden sm:block text-right">
+            <span class="text-xs text-slate-400 block font-medium">Tarif Resmi Outlet</span>
+            <span class="text-sm font-bold text-brand-700">Majasem, Cirebon</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mt-8 items-center">
+          <!-- Input Form Kalkulator -->
+          <div class="md:col-span-7 space-y-6">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">1. Pilih Jenis Layanan</label>
+              <select id="calc_service" onchange="calculateEstimate()" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm bg-slate-50 font-medium">
+                <option value="7000" data-unit="kg" data-time="2 Hari">Cuci Komplit Kiloan - Rp 7.000 / kg (2 Hari)</option>
+                <option value="12000" data-unit="kg" data-time="4-6 Jam" selected>Cuci Express Kilat - Rp 12.000 / kg (4-6 Jam)</option>
+                <option value="5000" data-unit="kg" data-time="1-2 Hari">Cuci Kering Lipat - Rp 5.000 / kg</option>
+                <option value="5000" data-unit="kg" data-time="1 Hari">Setrika Uap Saja - Rp 5.000 / kg</option>
+                <option value="25000" data-unit="pcs" data-time="2-3 Hari">Cuci Satuan: Bed Cover Sedang - Rp 25.000 / pcs</option>
+                <option value="35000" data-unit="pcs" data-time="2-3 Hari">Cuci Satuan: Bed Cover Besar - Rp 35.000 / pcs</option>
+                <option value="20000" data-unit="pcs" data-time="2 Hari">Cuci Satuan: Selimut Tebal - Rp 20.000 / pcs</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-700">2. Perkiraan Berat / Jumlah</label>
+                <span class="text-sm font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-lg border border-brand-200" id="calc_weight_display">3 Kg</span>
+              </div>
+              <input type="range" id="calc_slider" min="1" max="25" step="0.5" value="3" oninput="onSliderChange(this.value)" class="w-full accent-cyan-600 cursor-pointer h-2 bg-slate-200 rounded-lg">
+              <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-medium">
+                <span>1 Kg / Pcs</span>
+                <span>10 Kg</span>
+                <span>25 Kg (Maksimal Slider)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Hasil Estimasi -->
+          <div class="md:col-span-5 bg-gradient-to-br from-brand-900 to-slate-900 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between space-y-6">
+            <div>
+              <span class="text-xs text-cyan-300 font-semibold uppercase tracking-wider block mb-1">Perkiraan Total Biaya</span>
+              <div class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" id="calc_total_display">
+                Rp 36.000
+              </div>
+              <p class="text-xs text-slate-300 mt-2 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>Estimasi Selesai: <strong class="text-white" id="calc_time_display">4 - 6 Jam</strong></span>
+              </p>
+            </div>
+
+            <div class="space-y-2 pt-4 border-t border-white/10">
+              <button onclick="applyEstimateToOrder()" class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-400 to-brand-500 text-slate-950 hover:opacity-95 transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+                <span>Pesan Layanan Ini</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+              </button>
+              <span class="text-[10px] text-slate-400 block text-center">*Biaya pasti ditimbang ulang secara akurat oleh kasir saat jemput.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FITUR TRACKING STATUS PESANAN RESI PUBLIK (BARU) -->
+  <section id="tracking-section" class="py-16 bg-white border-b border-slate-100">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
+        <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-xl mx-auto text-center space-y-3 mb-8 relative z-10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold uppercase tracking-wider border border-cyan-500/30">
+            <span>🔍</span> Lacak Transparan
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Cek Status Cucian Anda Secara Real-Time</h2>
+          <p class="text-sm text-slate-300">Masukkan No. Resi (contoh: BAL-202610-xxx) atau Nomor WhatsApp yang terdaftar untuk memantau progres pencucian.</p>
+        </div>
+
+        <div class="max-w-xl mx-auto relative z-10">
+          <form id="trackingForm" class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="track_query" required placeholder="Ketik No. Resi (BAL-...) atau No. HP..." class="flex-1 px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 transition">
+            <button type="submit" id="trackBtn" class="px-7 py-3.5 rounded-xl font-bold text-sm bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25">
+              <span>Lacak Cucian</span>
+            </button>
+          </form>
+
+          <!-- Area Hasil Tracking -->
+          <div id="trackingResult" class="hidden mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/15 transition">
+            <!-- Konten diisi lewat JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
       </div>
     </div>
   </section>
@@ -690,6 +810,127 @@
         submitBtn.disabled = false;
       }
     });
+
+    // ===== FITUR BARU: KALKULATOR ESTIMASI BIAYA LAUNDRY =====
+    function calculateEstimate() {
+      const select = document.getElementById('calc_service');
+      const slider = document.getElementById('calc_slider');
+      const weightDisplay = document.getElementById('calc_weight_display');
+      const totalDisplay = document.getElementById('calc_total_display');
+      const timeDisplay = document.getElementById('calc_time_display');
+
+      if (!select || !slider) return;
+
+      const pricePerUnit = parseInt(select.value, 10);
+      const opt = select.options[select.selectedIndex];
+      const unit = opt.getAttribute('data-unit') || 'kg';
+      const timeEst = opt.getAttribute('data-time') || '-';
+      const qty = parseFloat(slider.value);
+
+      weightDisplay.textContent = `${qty} ${unit.toUpperCase()}`;
+      timeDisplay.textContent = timeEst;
+
+      const total = Math.round(pricePerUnit * qty);
+      totalDisplay.textContent = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
+    function onSliderChange(val) {
+      calculateEstimate();
+    }
+
+    function applyEstimateToOrder() {
+      const select = document.getElementById('calc_service');
+      const slider = document.getElementById('calc_slider');
+      const opt = select.options[select.selectedIndex];
+      const serviceName = opt.text.split(' - ')[0];
+
+      // Set input di order form yang sudah ada
+      selectService(serviceName);
+
+      const notesField = document.querySelector('textarea[name="special_notes"]');
+      if (notesField) {
+        notesField.value = `[Estimasi Kalkulator: ${serviceName} ~ ${slider.value} ${opt.getAttribute('data-unit') || 'kg'}]`;
+      }
+
+      const orderForm = document.getElementById('order-form');
+      if (orderForm) {
+        orderForm.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Inisialisasi awal kalkulator saat load
+    calculateEstimate();
+
+    // ===== FITUR BARU: TRACKING PESANAN RESI REAL-TIME =====
+    const trackingForm = document.getElementById('trackingForm');
+    if (trackingForm) {
+      trackingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = document.getElementById('track_query').value.trim();
+        const resultBox = document.getElementById('trackingResult');
+        const trackBtn = document.getElementById('trackBtn');
+
+        if (!query) return;
+
+        trackBtn.disabled = true;
+        trackBtn.innerHTML = '<span>Mencari...</span>';
+
+        try {
+          const res = await fetch(`/api/orders/track?q=${encodeURIComponent(query)}`);
+          const data = await res.json();
+
+          resultBox.classList.remove('hidden');
+
+          if (data.success && data.data && data.data.length > 0) {
+            let html = '<div class="space-y-4">';
+            data.data.forEach(order => {
+              const status = (order.status || 'Baru Diterima').toUpperCase();
+              let badgeBg = 'bg-amber-400 text-slate-950';
+              if (status.includes('SELESAI') || status.includes('SIAP')) {
+                badgeBg = 'bg-emerald-400 text-slate-950 font-bold';
+              } else if (status.includes('PROSES') || status.includes('CUCI')) {
+                badgeBg = 'bg-cyan-400 text-slate-950 font-bold';
+              }
+
+              html += `
+                <div class="p-4 rounded-xl bg-white/10 border border-white/20 text-left">
+                  <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                    <div>
+                      <span class="text-xs text-cyan-300 font-mono font-bold tracking-wider">${order.order_code || 'BAL-ORDER'}</span>
+                      <h4 class="text-base font-bold text-white">${order.customer_name || 'Pelanggan'}</h4>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs uppercase ${badgeBg}">${status}</span>
+                  </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-300 border-t border-white/10 pt-2.5 mt-2">
+                    <div>Layanan: <strong class="text-white block">${order.service_type || '-'}</strong></div>
+                    <div>Berat/Jumlah: <strong class="text-white block">${order.weight_kg ? order.weight_kg + ' Kg' : (order.estimated_weight || '-')}</strong></div>
+                    <div>Total Bayar: <strong class="text-cyan-300 block">Rp ${Number(order.total_price || 0).toLocaleString('id-ID')}</strong></div>
+                  </div>
+                </div>
+              `;
+            });
+            html += '</div>';
+            resultBox.innerHTML = html;
+          } else {
+            resultBox.innerHTML = `
+              <div class="text-center py-4 text-amber-300 text-sm">
+                ⚠️ ${data.message || 'Pesanan tidak ditemukan. Pastikan nomor resi atau no HP sudah benar.'}
+              </div>
+            `;
+          }
+        } catch (err) {
+          resultBox.classList.remove('hidden');
+          resultBox.innerHTML = `
+            <div class="text-center py-4 text-rose-300 text-sm">
+              Gagal memuat status: ${err.message}
+            </div>
+          `;
+        } finally {
+          trackBtn.disabled = false;
+          trackBtn.innerHTML = '<span>Lacak Cucian</span>';
+        }
+      });
+    }
   </script>
 </body>
 </html>
