@@ -561,12 +561,26 @@
           <div>
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
               <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Alamat Lengkap & Patokan di Majasem/Cirebon <span class="text-rose-500">*</span></label>
-              <button type="button" id="btnDetectGps" onclick="detectUserLocation()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-brand-700 text-xs font-bold transition">
-                <span id="gpsIcon">📍</span>
-                <span id="gpsText">Aktifkan Lokasi / Deteksi GPS</span>
-              </button>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <button type="button" id="btnDetectGps" onclick="detectUserLocation()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-brand-700 text-xs font-bold transition">
+                  <span id="gpsIcon">📍</span>
+                  <span id="gpsText">Aktifkan GPS Otomatis</span>
+                </button>
+                <button type="button" onclick="openMapsPicker()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-semibold transition" title="Buka Google Maps">
+                  <span>🗺️ Pilih Titik di Maps</span>
+                </button>
+              </div>
             </div>
             <textarea id="pickup_address" required rows="3" placeholder="Contoh: Jl. Majasem Indah Blok C No. 14 (Rumah pagar hitam samping Toko Sembako Bu Siti), Kel. Karyamulya, Kec. Kesambi, Cirebon" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition"></textarea>
+            
+            <!-- Quick Chips Alamat Populer Majasem -->
+            <div class="mt-2 flex items-center gap-1.5 flex-wrap text-[11px] text-slate-500">
+              <span class="font-medium text-slate-400">Pilih Cepat:</span>
+              <button type="button" onclick="setQuickAddress('Perumahan Majasem Indah')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">Perum Majasem Indah</button>
+              <button type="button" onclick="setQuickAddress('Jl. Majasem Raya (Dekat IAIN / UIN)')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">Sekitar Kampus UIN / Majasem</button>
+              <button type="button" onclick="setQuickAddress('Kelurahan Karyamulya, Kesambi')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">Karyamulya</button>
+            </div>
+
             <div id="gpsStatusBox" class="hidden mt-2 p-2.5 rounded-xl bg-cyan-50 border border-cyan-200 text-xs text-brand-900 flex items-center justify-between">
               <span id="gpsStatusText">Lokasi berhasil terdeteksi</span>
               <a id="gpsMapLink" href="#" target="_blank" class="text-brand-700 font-bold underline hover:text-brand-900 flex items-center gap-1">
@@ -870,6 +884,23 @@
       }
     });
 
+    // ===== PILIHAN CEPAT ALAMAT MAJASEM =====
+    function setQuickAddress(areaName) {
+      const addressBox = document.getElementById('pickup_address');
+      const cur = addressBox.value.trim();
+      addressBox.value = cur ? `${cur}, ${areaName}` : `${areaName}, Kota Cirebon`;
+      addressBox.focus();
+    }
+
+    function openMapsPicker() {
+      // Membuka Google Maps di Majasem Cirebon agar user bisa share pin / salin alamat
+      window.open('https://www.google.com/maps/search/Majasem+Cirebon', '_blank');
+      const addressBox = document.getElementById('pickup_address');
+      if (!addressBox.value) {
+        addressBox.placeholder = 'Tempelkan link pin lokasi Maps atau tulis patokan rumah di sini...';
+      }
+    }
+
     // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (GPS GEOLOCATION) =====
     function detectUserLocation() {
       const btn = document.getElementById('btnDetectGps');
@@ -882,89 +913,54 @@
       const geoCoords = document.getElementById('geo_coordinates');
 
       if (!navigator.geolocation) {
-        alert('Browser Anda tidak mendukung deteksi lokasi (Geolocation). Mohon ketik alamat secara manual.');
+        alert('Browser Anda tidak mendukung deteksi lokasi otomatis. Silakan ketik alamat secara manual.');
         return;
       }
 
       icon.textContent = '⏳';
-      text.textContent = 'Mencari Titik GPS...';
+      text.textContent = 'Mendeteksi...';
       btn.disabled = true;
 
-      // Fungsi handler sukses deteksi posisi
-      const onPosSuccess = async (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const accuracy = Math.round(position.coords.accuracy || 10);
-
-        geoCoords.value = `${lat},${lng}`;
-        const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-        mapLink.href = gmapsUrl;
-
-        icon.textContent = '📍';
-        text.textContent = 'Lokasi Terdeteksi ✓';
-        btn.classList.remove('bg-cyan-50', 'text-brand-700');
-        btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
-
-        statusBox.classList.remove('hidden');
-        statusText.textContent = `Titik GPS siap (Akurasi ±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-
-        // Reverse Geocoding via Nominatim OpenStreetMap dengan timeout 4 detik
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4000);
-          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
-            signal: controller.signal
-          });
-          clearTimeout(timeoutId);
-
-          if (geoRes.ok) {
-            const geoData = await geoRes.json();
-            if (geoData && geoData.display_name) {
-              const currentVal = addressBox.value.trim();
-              const detectedAddr = geoData.display_name;
-              addressBox.value = currentVal ? `${currentVal}\n[Alamat GPS: ${detectedAddr}]` : detectedAddr;
-            }
-          }
-        } catch (e) {
-          // Jika reverse geocoding lambat, tetap tempelkan koordinat maps
-          const currentVal = addressBox.value.trim();
-          if (!currentVal) {
-            addressBox.value = `[Koordinat GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\nJl. Majasem / Cirebon`;
-          }
-        }
-        btn.disabled = false;
-      };
-
-      // Coba pertama: Cepat (maksimal 20 detik, izinkan cache lokasi terkini HP)
+      // Panggil Geolocation tanpa memblokir
       navigator.geolocation.getCurrentPosition(
-        onPosSuccess,
-        (error) => {
-          // Jika highAccuracy gagal/timeout karena berada di dalam ruangan, coba fallback low accuracy (BTS seluler / WiFi)
-          if (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) {
-            text.textContent = 'Mencoba Jaringan Seluler/WiFi...';
-            navigator.geolocation.getCurrentPosition(
-              onPosSuccess,
-              (errFallback) => {
-                btn.disabled = false;
-                icon.textContent = '📍';
-                text.textContent = 'Aktifkan Lokasi / Deteksi GPS';
-                alert('GPS HP membutuhkan waktu lebih lama. Silakan pastikan Layanan Lokasi (GPS) di HP sudah AKTIF, atau ketik alamat secara manual.');
-              },
-              { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 }
-            );
-            return;
-          }
-
+        (position) => {
           btn.disabled = false;
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const accuracy = Math.round(position.coords.accuracy || 15);
+
+          geoCoords.value = `${lat},${lng}`;
+          const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          mapLink.href = gmapsUrl;
+
           icon.textContent = '📍';
-          text.textContent = 'Aktifkan Lokasi / Deteksi GPS';
-          if (error.code === error.PERMISSION_DENIED) {
-            alert('Izin akses lokasi ditolak di browser HP. Silakan buka Pengaturan Izin Situs Chrome dan izinkan "Lokasi".');
-          } else {
-            alert('Tidak dapat mengambil titik lokasi: ' + (error.message || 'Silakan ketik manual.'));
+          text.textContent = 'Lokasi Terkunci ✓';
+          btn.classList.remove('bg-cyan-50', 'text-brand-700');
+          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+
+          statusBox.classList.remove('hidden');
+          statusText.textContent = `Titik GPS siap (±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+          if (!addressBox.value.trim()) {
+            addressBox.value = `[Pin GPS Terdeteksi: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\nJl. Majasem / Cirebon (Tulis nomor rumah/patokan di sini)`;
           }
         },
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
+        (error) => {
+          btn.disabled = false;
+          icon.textContent = '📍';
+          text.textContent = 'Aktifkan GPS Otomatis';
+
+          if (error.code === error.PERMISSION_DENIED) {
+            alert('Akses lokasi diblokir oleh browser. Anda bisa menggunakan tombol "🗺️ Pilih Titik di Maps" atau mengetikkan alamat langsung.');
+          } else {
+            // Jika GPS satelit gagal mengunci karena di dalam ruangan, berikan bantuan langsung
+            const confirmMaps = confirm('Satelit GPS HP sulit mengunci titik karena berada di dalam ruangan.\n\nApakah ingin membuka Google Maps untuk melihat koordinat lokasi Anda?');
+            if (confirmMaps) {
+              openMapsPicker();
+            }
+          }
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
       );
     }
 
