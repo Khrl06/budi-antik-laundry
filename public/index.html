@@ -887,58 +887,84 @@
       }
 
       icon.textContent = '⏳';
-      text.textContent = 'Mendeteksi Titik GPS...';
+      text.textContent = 'Mencari Titik GPS...';
       btn.disabled = true;
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const accuracy = Math.round(position.coords.accuracy);
+      // Fungsi handler sukses deteksi posisi
+      const onPosSuccess = async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const accuracy = Math.round(position.coords.accuracy || 10);
 
-          geoCoords.value = `${lat},${lng}`;
-          const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-          mapLink.href = gmapsUrl;
+        geoCoords.value = `${lat},${lng}`;
+        const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        mapLink.href = gmapsUrl;
 
-          icon.textContent = '📍';
-          text.textContent = 'Lokasi Terdeteksi';
-          btn.classList.remove('bg-cyan-50', 'text-brand-700');
-          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+        icon.textContent = '📍';
+        text.textContent = 'Lokasi Terdeteksi ✓';
+        btn.classList.remove('bg-cyan-50', 'text-brand-700');
+        btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
 
-          statusBox.classList.remove('hidden');
-          statusText.textContent = `Titik GPS terdeteksi (Akurasi ±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        statusBox.classList.remove('hidden');
+        statusText.textContent = `Titik GPS siap (Akurasi ±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
-          // Reverse Geocoding via OpenStreetMap Nominatim
-          try {
-            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
-            if (geoRes.ok) {
-              const geoData = await geoRes.json();
-              if (geoData && geoData.display_name) {
-                const currentVal = addressBox.value.trim();
-                const detectedAddr = geoData.display_name;
-                addressBox.value = currentVal ? `${currentVal}\n[Alamat GPS: ${detectedAddr}]` : detectedAddr;
-              }
+        // Reverse Geocoding via Nominatim OpenStreetMap dengan timeout 4 detik
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            if (geoData && geoData.display_name) {
+              const currentVal = addressBox.value.trim();
+              const detectedAddr = geoData.display_name;
+              addressBox.value = currentVal ? `${currentVal}\n[Alamat GPS: ${detectedAddr}]` : detectedAddr;
             }
-          } catch (e) {
-            console.log('Reverse geocoding skip:', e);
           }
-          btn.disabled = false;
-        },
+        } catch (e) {
+          // Jika reverse geocoding lambat, tetap tempelkan koordinat maps
+          const currentVal = addressBox.value.trim();
+          if (!currentVal) {
+            addressBox.value = `[Koordinat GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\nJl. Majasem / Cirebon`;
+          }
+        }
+        btn.disabled = false;
+      };
+
+      // Coba pertama: Cepat (maksimal 20 detik, izinkan cache lokasi terkini HP)
+      navigator.geolocation.getCurrentPosition(
+        onPosSuccess,
         (error) => {
+          // Jika highAccuracy gagal/timeout karena berada di dalam ruangan, coba fallback low accuracy (BTS seluler / WiFi)
+          if (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) {
+            text.textContent = 'Mencoba Jaringan Seluler/WiFi...';
+            navigator.geolocation.getCurrentPosition(
+              onPosSuccess,
+              (errFallback) => {
+                btn.disabled = false;
+                icon.textContent = '📍';
+                text.textContent = 'Aktifkan Lokasi / Deteksi GPS';
+                alert('GPS HP membutuhkan waktu lebih lama. Silakan pastikan Layanan Lokasi (GPS) di HP sudah AKTIF, atau ketik alamat secara manual.');
+              },
+              { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 }
+            );
+            return;
+          }
+
           btn.disabled = false;
           icon.textContent = '📍';
           text.textContent = 'Aktifkan Lokasi / Deteksi GPS';
-          let msg = 'Gagal mendeteksi lokasi.';
           if (error.code === error.PERMISSION_DENIED) {
-            msg = 'Izin akses lokasi ditolak. Silakan izinkan browser atau ketik alamat manual.';
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            msg = 'Sinyal GPS / lokasi tidak tersedia.';
-          } else if (error.code === error.TIMEOUT) {
-            msg = 'Waktu permintaan lokasi habis.';
+            alert('Izin akses lokasi ditolak di browser HP. Silakan buka Pengaturan Izin Situs Chrome dan izinkan "Lokasi".');
+          } else {
+            alert('Tidak dapat mengambil titik lokasi: ' + (error.message || 'Silakan ketik manual.'));
           }
-          alert(msg);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
       );
     }
 
