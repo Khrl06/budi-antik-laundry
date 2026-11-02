@@ -73,24 +73,32 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
     <!-- Status Cards & Fonnte Status -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pesanan</div>
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Semua</div>
         <div class="text-3xl font-extrabold text-slate-900 mt-2" id="statTotal">0</div>
         <div class="text-xs text-slate-500 mt-1">Semua pesanan masuk</div>
       </div>
+      <div class="bg-white p-5 rounded-2xl border-2 border-brand-500 shadow-sm bg-brand-50/20">
+        <div class="text-xs font-bold uppercase tracking-wider text-brand-700 flex items-center justify-between">
+          <span>Hari Ini</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+        <div class="text-3xl font-extrabold text-brand-700 mt-2" id="statToday">0</div>
+        <div class="text-xs text-brand-600 font-semibold mt-1" id="statTodayOmzet">Rp 0</div>
+      </div>
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="text-xs font-bold uppercase tracking-wider text-amber-500">Menunggu Jemput</div>
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Bulan Ini</div>
+        <div class="text-3xl font-extrabold text-slate-800 mt-2" id="statMonth">0</div>
+        <div class="text-xs text-slate-500 font-semibold mt-1" id="statMonthOmzet">Rp 0</div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-amber-500">Antrean Jemput</div>
         <div class="text-3xl font-extrabold text-amber-600 mt-2" id="statPending">0</div>
-        <div class="text-xs text-slate-500 mt-1">Kurir perlu menjemput</div>
+        <div class="text-xs text-slate-500 mt-1">Perlu dijemput kurir</div>
       </div>
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="text-xs font-bold uppercase tracking-wider text-cyan-600">Proses Cuci</div>
-        <div class="text-3xl font-extrabold text-cyan-600 mt-2" id="statProcessing">0</div>
-        <div class="text-xs text-slate-500 mt-1">Sedang dicuci / disetrika</div>
-      </div>
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="text-xs font-bold uppercase tracking-wider text-emerald-600">Fonnte WhatsApp</div>
+        <div class="text-xs font-bold uppercase tracking-wider text-emerald-600">Fonnte WA</div>
         <div class="text-sm font-bold mt-2" id="statFonnte">Memeriksa...</div>
         <div class="text-xs text-slate-500 mt-1" id="statFonnteDesc">Gateway Notifikasi WA</div>
       </div>
@@ -116,17 +124,24 @@
 
     <!-- Daftar Pesanan Masuk -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 class="text-lg font-bold text-slate-900">Daftar Antrean & Pesanan Masuk</h2>
-          <p class="text-xs text-slate-500">Hanya dapat diakses dan diubah oleh pemilik / admin</p>
+          <p class="text-xs text-slate-500">Filter data pesanan harian atau bulanan secara fleksibel</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="exportOrdersToCSV()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl transition flex items-center gap-1.5">
-            📥 Export CSV / Excel
+        
+        <!-- Filter Tabs: HARI INI vs BULAN INI vs SEMUA -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-bold text-slate-600">
+            <button type="button" onclick="setPeriodFilter('hari_ini')" id="btnFilterToday" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-brand-700 transition">Hari Ini</button>
+            <button type="button" onclick="setPeriodFilter('bulan_ini')" id="btnFilterMonth" class="px-3 py-1.5 rounded-lg hover:text-slate-900 transition">Bulan Ini</button>
+            <button type="button" onclick="setPeriodFilter('semua')" id="btnFilterAll" class="px-3 py-1.5 rounded-lg hover:text-slate-900 transition">Semua</button>
+          </div>
+          <button onclick="exportOrdersToCSV()" class="px-3 py-2 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl transition flex items-center gap-1.5">
+            📥 Export CSV
           </button>
-          <button onclick="fetchOrders()" class="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
-            🔄 Refresh Data
+          <button onclick="fetchOrders()" class="px-3 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+            🔄 Refresh
           </button>
         </div>
       </div>
@@ -137,9 +152,9 @@
             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold">
               <th class="p-4">Kode Order</th>
               <th class="p-4">Pelanggan</th>
-              <th class="p-4">Layanan & Est</th>
+              <th class="p-4">Layanan & Harga</th>
               <th class="p-4">Waktu Jemput</th>
-              <th class="p-4">Alamat Majasem</th>
+              <th class="p-4">Alamat & Catatan</th>
               <th class="p-4">Status</th>
               <th class="p-4 text-center">Aksi Status</th>
             </tr>
@@ -231,6 +246,133 @@
       }
     }
 
+    let currentPeriodFilter = 'semua';
+
+    function setPeriodFilter(period) {
+      currentPeriodFilter = period;
+      const bToday = document.getElementById('btnFilterToday');
+      const bMonth = document.getElementById('btnFilterMonth');
+      const bAll = document.getElementById('btnFilterAll');
+
+      [bToday, bMonth, bAll].forEach(b => {
+        b.className = 'px-3 py-1.5 rounded-lg hover:text-slate-900 transition';
+      });
+
+      if (period === 'hari_ini') {
+        bToday.className = 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-brand-700 font-bold transition';
+      } else if (period === 'bulan_ini') {
+        bMonth.className = 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-brand-700 font-bold transition';
+      } else {
+        bAll.className = 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-brand-700 font-bold transition';
+      }
+
+      renderOrdersTable();
+    }
+
+    // Hitung estimasi harga dari layanan & berat
+    function estimatePrice(serviceType, weightStr) {
+      let unitPrice = 7000; // default komplit kiloan
+      const s = (serviceType || '').toLowerCase();
+      if (s.includes('express')) unitPrice = 12000;
+      else if (s.includes('kering lipat')) unitPrice = 5000;
+      else if (s.includes('setrika')) unitPrice = 5000;
+      else if (s.includes('bed cover')) unitPrice = 25000;
+      else if (s.includes('selimut') || s.includes('karpet') || s.includes('jas')) unitPrice = 20000;
+
+      // Cek apakah ada angka berat di string (misal: "3 kg" -> 3)
+      const numMatch = (weightStr || '').match(/(\d+(\.\d+)?)/);
+      const qty = numMatch ? parseFloat(numMatch[1]) : 1;
+      const total = Math.round(unitPrice * qty);
+      return { unitPrice, qty, total };
+    }
+
+    function renderOrdersTable() {
+      const allOrders = window.rawLoadedOrders || [];
+      const tbody = document.getElementById('ordersTableBody');
+
+      // Ambil tanggal hari ini dan bulan ini (format YYYY-MM-DD)
+      const now = new Date();
+      const todayStr = now.toISOString().slice(0, 10);
+      const currentMonthStr = todayStr.slice(0, 7);
+
+      // Filter berdasarkan periode
+      let filtered = allOrders;
+      if (currentPeriodFilter === 'hari_ini') {
+        filtered = allOrders.filter(o => (o.pickup_date && o.pickup_date === todayStr) || (o.created_at && o.created_at.startsWith(todayStr)));
+      } else if (currentPeriodFilter === 'bulan_ini') {
+        filtered = allOrders.filter(o => (o.pickup_date && o.pickup_date.startsWith(currentMonthStr)) || (o.created_at && o.created_at.startsWith(currentMonthStr)));
+      }
+
+      window.currentLoadedOrders = filtered;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada pesanan untuk filter "${currentPeriodFilter.replace('_', ' ').toUpperCase()}".</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(order => {
+        let statusBadge = '';
+        if (order.status === 'pending') {
+          statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full">Menunggu Jemput</span>';
+        } else if (order.status === 'dijemput') {
+          statusBadge = '<span class="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full">Sudah Dijemput</span>';
+        } else if (order.status === 'proses_cuci') {
+          statusBadge = '<span class="bg-cyan-100 text-cyan-800 font-bold px-2.5 py-1 rounded-full">Proses Cuci</span>';
+        } else if (order.status === 'selesai') {
+          statusBadge = '<span class="bg-purple-100 text-purple-800 font-bold px-2.5 py-1 rounded-full">Selesai / Siap Antar</span>';
+        } else if (order.status === 'diantar') {
+          statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Selesai Diantar</span>';
+        }
+
+        const cleanPhone = order.customer_phone.replace(/[^0-9]/g, '');
+        const waFormatted = cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone;
+        const priceInfo = estimatePrice(order.service_type, order.estimated_weight);
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-mono font-bold text-brand-700">
+              ${order.order_code}
+              <div class="text-[10px] text-slate-400 font-normal mt-0.5">${(order.created_at || '').slice(0, 16)}</div>
+            </td>
+            <td class="p-4">
+              <div class="font-bold text-slate-900">${order.customer_name}</div>
+              <a href="https://wa.me/${waFormatted}" target="_blank" class="text-[11px] text-emerald-600 hover:underline flex items-center gap-1 mt-0.5 font-medium">
+                💬 ${order.customer_phone}
+              </a>
+            </td>
+            <td class="p-4">
+              <div class="font-medium text-slate-900">${order.service_type}</div>
+              <div class="text-slate-500 text-[11px]">Tarif: Rp ${priceInfo.unitPrice.toLocaleString('id-ID')} | Est: ${order.estimated_weight || '1 kg'}</div>
+              <div class="text-brand-700 font-extrabold text-xs mt-0.5">Total: Rp ${priceInfo.total.toLocaleString('id-ID')}</div>
+            </td>
+            <td class="p-4">
+              <div class="font-medium">${order.pickup_date}</div>
+              <div class="text-slate-500 text-[11px]">${order.pickup_time}</div>
+            </td>
+            <td class="p-4 max-w-xs truncate" title="${order.pickup_address}">
+              ${order.pickup_address}
+              ${order.pickup_notes && order.pickup_notes !== '-' ? `<div class="text-slate-400 text-[10px] italic mt-0.5">Note: ${order.pickup_notes}</div>` : ''}
+            </td>
+            <td class="p-4">${statusBadge}</td>
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
+                  <option value="" disabled selected>Ubah Status</option>
+                  <option value="dijemput">Sudah Dijemput</option>
+                  <option value="proses_cuci">Proses Cuci</option>
+                  <option value="selesai">Selesai Cuci (Siap Antar)</option>
+                  <option value="diantar">Sudah Diantar</option>
+                </select>
+                <button onclick="printThermalReceipt(${order.id})" title="Cetak Nota Resi Struk" class="px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center gap-1 font-semibold text-[11px]">
+                  <span>🖨️</span> Struk
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     async function fetchOrders() {
       const key = getAdminKey();
       if (!key) return;
@@ -246,77 +388,39 @@
         const result = await res.json();
         if (!result.success) return;
 
-        const orders = result.data;
+        const orders = result.data || [];
+        window.rawLoadedOrders = orders;
+
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+        const currentMonthStr = todayStr.slice(0, 7);
+
+        // Hitung statistik hari ini
+        const todayOrders = orders.filter(o => (o.pickup_date && o.pickup_date === todayStr) || (o.created_at && o.created_at.startsWith(todayStr)));
+        let todayOmzet = 0;
+        todayOrders.forEach(o => {
+          todayOmzet += estimatePrice(o.service_type, o.estimated_weight).total;
+        });
+
+        // Hitung statistik bulan ini
+        const monthOrders = orders.filter(o => (o.pickup_date && o.pickup_date.startsWith(currentMonthStr)) || (o.created_at && o.created_at.startsWith(currentMonthStr)));
+        let monthOmzet = 0;
+        monthOrders.forEach(o => {
+          monthOmzet += estimatePrice(o.service_type, o.estimated_weight).total;
+        });
+
         document.getElementById('statTotal').textContent = orders.length;
+        document.getElementById('statToday').textContent = todayOrders.length;
+        document.getElementById('statTodayOmzet').textContent = 'Rp ' + todayOmzet.toLocaleString('id-ID');
+        document.getElementById('statMonth').textContent = monthOrders.length;
+        document.getElementById('statMonthOmzet').textContent = 'Rp ' + monthOmzet.toLocaleString('id-ID');
         document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
-        document.getElementById('statProcessing').textContent = orders.filter(o => o.status === 'proses_cuci' || o.status === 'dijemput').length;
 
-        const tbody = document.getElementById('ordersTableBody');
-        if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">Belum ada pesanan masuk dari website.</td></tr>';
-          return;
-        }
-
-        window.currentLoadedOrders = orders;
-        tbody.innerHTML = orders.map(order => {
-          let statusBadge = '';
-          if (order.status === 'pending') {
-            statusBadge = '<span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full">Menunggu Jemput</span>';
-          } else if (order.status === 'dijemput') {
-            statusBadge = '<span class="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full">Sudah Dijemput</span>';
-          } else if (order.status === 'proses_cuci') {
-            statusBadge = '<span class="bg-cyan-100 text-cyan-800 font-bold px-2.5 py-1 rounded-full">Proses Cuci</span>';
-          } else if (order.status === 'selesai') {
-            statusBadge = '<span class="bg-purple-100 text-purple-800 font-bold px-2.5 py-1 rounded-full">Selesai / Siap Antar</span>';
-          } else if (order.status === 'diantar') {
-            statusBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Selesai Diantar</span>';
-          }
-
-          const cleanPhone = order.customer_phone.replace(/[^0-9]/g, '');
-          const waFormatted = cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone;
-
-          return `
-            <tr class="hover:bg-slate-50 transition">
-              <td class="p-4 font-mono font-bold text-brand-700">${order.order_code}</td>
-              <td class="p-4">
-                <div class="font-bold text-slate-900">${order.customer_name}</div>
-                <a href="https://wa.me/${waFormatted}" target="_blank" class="text-[11px] text-emerald-600 hover:underline flex items-center gap-1 mt-0.5">
-                  💬 ${order.customer_phone}
-                </a>
-              </td>
-              <td class="p-4">
-                <div class="font-medium">${order.service_type}</div>
-                <div class="text-slate-400 text-[11px]">${order.estimated_weight || '-'}</div>
-              </td>
-              <td class="p-4">
-                <div>${order.pickup_date}</div>
-                <div class="text-slate-500 text-[11px]">${order.pickup_time}</div>
-              </td>
-              <td class="p-4 max-w-xs truncate" title="${order.pickup_address}">
-                ${order.pickup_address}
-                ${order.pickup_notes && order.pickup_notes !== '-' ? `<div class="text-slate-400 text-[10px] italic">Note: ${order.pickup_notes}</div>` : ''}
-              </td>
-              <td class="p-4">${statusBadge}</td>
-              <td class="p-4 text-center">
-                <div class="flex items-center justify-center gap-1.5">
-                  <select onchange="updateStatus(${order.id}, this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-white outline-none">
-                    <option value="" disabled selected>Ubah Status</option>
-                    <option value="dijemput">Sudah Dijemput</option>
-                    <option value="proses_cuci">Proses Cuci</option>
-                    <option value="selesai">Selesai Cuci (Siap Antar)</option>
-                    <option value="diantar">Sudah Diantar</option>
-                  </select>
-                  <button onclick="printThermalReceipt(${order.id})" title="Cetak Nota Resi Struk" class="p-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700">
-                    🖨️
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
+        renderOrdersTable();
       } catch (err) {
         console.error(err);
+      }
+    }
       }
     }
 
@@ -414,50 +518,82 @@
       document.body.removeChild(link);
     }
 
-    // ===== FITUR BARU: CETAK STRUK RESI KASIR THERMAL =====
+    // ===== FITUR BARU: CETAK STRUK RESI KASIR THERMAL LENGKAP HARGA =====
     function printThermalReceipt(orderId) {
-      const orders = window.currentLoadedOrders || [];
+      const orders = window.rawLoadedOrders || window.currentLoadedOrders || [];
       const order = orders.find(o => o.id == orderId);
       if (!order) {
         alert('Data pesanan tidak ditemukan.');
         return;
       }
 
-      const printWin = window.open('', '', 'width=400,height=600');
+      const pInfo = estimatePrice(order.service_type, order.estimated_weight);
+      const paymentMethod = (order.pickup_notes || '').includes('Pembayaran: QRIS') ? 'QRIS / Digital' : 'Tunai / COD';
+
+      const printWin = window.open('', '', 'width=420,height=650');
       printWin.document.write(`
         <html>
         <head>
           <title>Struk Resi - ${order.order_code}</title>
           <style>
-            body { font-family: monospace; font-size: 12px; margin: 0; padding: 15px; color: #000; }
+            body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 20px; color: #000; width: 320px; }
             .text-center { text-align: center; }
+            .text-right { text-align: right; }
             .line { border-top: 1px dashed #000; margin: 8px 0; }
-            .flex-between { display: flex; justify-content: space-between; }
+            .double-line { border-top: 2px dashed #000; margin: 10px 0; }
+            .flex-between { display: flex; justify-content: space-between; margin-bottom: 3px; }
             .font-bold { font-weight: bold; }
+            .item-row { margin-bottom: 4px; }
           </style>
         </head>
         <body onload="window.print(); window.close();">
-          <div class="text-center font-bold" style="font-size: 14px;">BUDI ANTIK LAUNDRY</div>
-          <div class="text-center">Jl. Majasem Perjuangan, Kota Cirebon</div>
-          <div class="text-center">WA: 0859-6273-8788</div>
+          <div class="text-center font-bold" style="font-size: 15px;">BUDI ANTIK LAUNDRY</div>
+          <div class="text-center" style="font-size: 11px;">Jl. Majasem Raya, Kesambi, Cirebon</div>
+          <div class="text-center" style="font-size: 11px;">WhatsApp: 0859-6273-8788</div>
+          <div class="double-line"></div>
+          
+          <div class="flex-between"><span>No Resi</span><span class="font-bold">${order.order_code}</span></div>
+          <div class="flex-between"><span>Tanggal</span><span>${order.pickup_date} (${order.pickup_time})</span></div>
+          <div class="flex-between"><span>Pelanggan</span><span class="font-bold">${order.customer_name}</span></div>
+          <div class="flex-between"><span>No. HP</span><span>${order.customer_phone}</span></div>
+          <div class="flex-between"><span>Pembayaran</span><span>${paymentMethod}</span></div>
+          
           <div class="line"></div>
-          <div class="flex-between"><span>No Resi:</span><span class="font-bold">${order.order_code}</span></div>
-          <div class="flex-between"><span>Pelanggan:</span><span>${order.customer_name}</span></div>
-          <div class="flex-between"><span>No Telp:</span><span>${order.customer_phone}</span></div>
-          <div class="flex-between"><span>Tgl Jemput:</span><span>${order.pickup_date} (${order.pickup_time})</span></div>
+          <div class="text-center font-bold" style="font-size: 11px; margin-bottom: 6px;">RINCIAN LAYANAN & TARIF</div>
+          
+          <div class="item-row">
+            <div class="font-bold">${order.service_type}</div>
+            <div class="flex-between" style="font-size: 11px; color: #333;">
+              <span>${pInfo.qty} Unit/Kg x Rp ${pInfo.unitPrice.toLocaleString('id-ID')}</span>
+              <span>Rp ${pInfo.total.toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+
           <div class="line"></div>
-          <div class="flex-between"><span>Layanan:</span><span>${order.service_type}</span></div>
-          <div class="flex-between"><span>Berat/Est:</span><span>${order.estimated_weight || '-'}</span></div>
-          <div class="flex-between font-bold"><span>Status:</span><span>${(order.status || '').toUpperCase()}</span></div>
+          <div class="flex-between font-bold" style="font-size: 13px;">
+            <span>TOTAL BIAYA:</span>
+            <span>Rp ${pInfo.total.toLocaleString('id-ID')}</span>
+          </div>
+          <div class="flex-between" style="font-size: 11px;">
+            <span>STATUS CUCIAN:</span>
+            <span class="font-bold">${(order.status || 'PENDING').toUpperCase()}</span>
+          </div>
+
+          <div class="double-line"></div>
+          <div style="font-size: 11px;">
+            <div><strong>Alamat Jemput:</strong></div>
+            <div>${order.pickup_address}</div>
+          </div>
+          
           <div class="line"></div>
-          <div><strong>Alamat:</strong> ${order.pickup_address}</div>
-          ${order.pickup_notes ? `<div><strong>Catatan:</strong> ${order.pickup_notes}</div>` : ''}
-          <div class="line"></div>
-          <div class="text-center" style="font-size: 11px;">
-            Lacak status cucian di:<br/>
+          <div class="text-center" style="font-size: 10.5px;">
+            Cek progres cucian Anda online:<br/>
             <strong>budi-antik-laundry.vercel.app</strong>
           </div>
-          <div class="text-center" style="margin-top: 10px;">-- Terima Kasih --</div>
+          <div class="text-center font-bold" style="margin-top: 10px; font-size: 11px;">
+            ~ Bersih, Harum, 1 Mesin 1 Klien ~<br/>
+            TERIMA KASIH
+          </div>
         </body>
         </html>
       `);
