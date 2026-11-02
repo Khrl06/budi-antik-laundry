@@ -897,8 +897,8 @@
       }
     }
 
-    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (PRIORITAS GPS LOKAL CIREBON) =====
-    async function detectUserLocation() {
+    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (GPS ASLI PERANGKAT) =====
+    function detectUserLocation() {
       const btn = document.getElementById('btnDetectGps');
       const icon = document.getElementById('gpsIcon');
       const text = document.getElementById('gpsText');
@@ -908,66 +908,67 @@
       const mapLink = document.getElementById('gpsMapLink');
       const geoCoords = document.getElementById('geo_coordinates');
 
+      if (!navigator.geolocation) {
+        alert('Browser HP Anda tidak mendukung fitur deteksi GPS.');
+        return;
+      }
+
       icon.textContent = '⏳';
-      text.textContent = 'Mendeteksi Titik Anda...';
+      text.textContent = 'Menghubungkan Satelit GPS...';
       btn.disabled = true;
 
-      const applyLocationResult = (lat, lng, labelText, sourceName) => {
-        btn.disabled = false;
-        geoCoords.value = `${lat},${lng}`;
-        const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-        mapLink.href = gmapsUrl;
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          btn.disabled = false;
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const accuracy = Math.round(position.coords.accuracy || 10);
 
-        icon.textContent = '📍';
-        text.textContent = 'Lokasi Terkunci ✓';
-        btn.classList.remove('bg-cyan-50', 'text-brand-700');
-        btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+          geoCoords.value = `${lat},${lng}`;
+          const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          mapLink.href = gmapsUrl;
 
-        statusBox.classList.remove('hidden');
-        statusText.textContent = `Lokasi terdeteksi (${sourceName}): ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+          icon.textContent = '📍';
+          text.textContent = 'GPS Terkunci ✓';
+          btn.classList.remove('bg-cyan-50', 'text-brand-700');
+          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
 
-        const curVal = addressBox.value.trim();
-        if (!curVal || curVal.includes('[Pin Lokasi')) {
-          addressBox.value = `[Pin GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}]\n${labelText}\n(Tulis no rumah / patokan jalan)`;
-        }
-      };
+          statusBox.classList.remove('hidden');
+          statusText.textContent = `Akurasi GPS ±${accuracy}m: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
-      // 1. Coba GPS Hardware Akurat Asli HP Terlebih Dahulu (High Accuracy)
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            // Reverse Geocoding via OpenStreetMap agar dapat nama jalan Cirebon yang asli
-            let streetName = 'Majasem, Kec. Kesambi, Kota Cirebon';
-            try {
-              const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
-              if (r.ok) {
-                const data = await r.json();
-                if (data && data.display_name) {
-                  streetName = data.display_name;
-                }
+          // Coba cari nama jalan asli dari koordinat HP
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (r.ok) {
+              const data = await r.json();
+              if (data && data.display_name) {
+                addressBox.value = `[Pin GPS Akurat: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\n${data.display_name}\n(Tambahkan patokan rumah / no HP)`;
+                return;
               }
-            } catch (e) {}
+            }
+          } catch (e) {}
 
-            applyLocationResult(lat, lng, streetName, 'GPS Perangkat');
-          },
-          (err) => {
-            // 2. Jika GPS perangkat di-block/gagal, jangan pakai IP seluler (karena IP operator sering terbaca server pusat seperti Jakarta/Bali).
-            // Kunci langsung ke titik default Area Toko Majasem Cirebon!
-            applyLocationResult(
-              -6.7533, 
-              108.5367, 
-              'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 
-              'Area Majasem Cirebon'
-            );
-          },
-          { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
-        );
-      } else {
-        applyLocationResult(-6.7533, 108.5367, 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 'Area Majasem Cirebon');
-      }
+          // Jika reverse nama jalan lambat, langsung pakai koordinat presisi HP
+          addressBox.value = `[Pin GPS Akurat: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\nLokasi Anda terdeteksi via satelit HP (Silakan tulis nama jalan / patokan rumah)`;
+        },
+        (error) => {
+          btn.disabled = false;
+          icon.textContent = '📍';
+          text.textContent = 'Aktifkan GPS Otomatis';
+
+          if (error.code === error.PERMISSION_DENIED) {
+            alert('Izin Lokasi diblokir di Chrome HP.\n\nCara buka:\n1. Klik ikon gembok / pengaturan di sebelah kiri link web di Chrome.\n2. Pilih "Izin Situs" -> Aktifkan "Lokasi".\n3. Lalu klik tombol GPS ini lagi.');
+          } else if (error.code === error.TIMEOUT) {
+            alert('Satelit GPS butuh waktu lebih lama karena di dalam ruangan.\n\nSilakan klik tombol "🗺️ Pilih Titik di Maps" atau pilih tombol cepat wilayah Majasem di bawah.');
+          } else {
+            alert('GPS HP tidak aktif: ' + error.message + '\n\nSilakan nyalakan tombol Lokasi di HP Anda.');
+          }
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
     }
 
     // ===== FITUR METODE PEMBAYARAN (TUNAI VS QRIS) =====
