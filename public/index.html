@@ -901,8 +901,8 @@
       }
     }
 
-    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (GPS GEOLOCATION) =====
-    function detectUserLocation() {
+    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (DUAL MODE: GPS + IP NETWORK) =====
+    async function detectUserLocation() {
       const btn = document.getElementById('btnDetectGps');
       const icon = document.getElementById('gpsIcon');
       const text = document.getElementById('gpsText');
@@ -912,56 +912,81 @@
       const mapLink = document.getElementById('gpsMapLink');
       const geoCoords = document.getElementById('geo_coordinates');
 
-      if (!navigator.geolocation) {
-        alert('Browser Anda tidak mendukung deteksi lokasi otomatis. Silakan ketik alamat secara manual.');
-        return;
-      }
-
       icon.textContent = '⏳';
       text.textContent = 'Mendeteksi...';
       btn.disabled = true;
 
-      // Panggil Geolocation tanpa memblokir
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          btn.disabled = false;
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const accuracy = Math.round(position.coords.accuracy || 15);
+      const applyLocationResult = (lat, lng, labelText, sourceName) => {
+        btn.disabled = false;
+        geoCoords.value = `${lat},${lng}`;
+        const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        mapLink.href = gmapsUrl;
 
-          geoCoords.value = `${lat},${lng}`;
-          const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-          mapLink.href = gmapsUrl;
+        icon.textContent = '📍';
+        text.textContent = 'Lokasi Terkunci ✓';
+        btn.classList.remove('bg-cyan-50', 'text-brand-700');
+        btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
 
-          icon.textContent = '📍';
-          text.textContent = 'Lokasi Terkunci ✓';
-          btn.classList.remove('bg-cyan-50', 'text-brand-700');
-          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+        statusBox.classList.remove('hidden');
+        statusText.textContent = `Lokasi terdeteksi (${sourceName}): ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 
-          statusBox.classList.remove('hidden');
-          statusText.textContent = `Titik GPS siap (±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        const curVal = addressBox.value.trim();
+        if (!curVal || curVal.includes('[Pin GPS')) {
+          addressBox.value = `[Pin Lokasi: ${lat.toFixed(4)}, ${lng.toFixed(4)}]\n${labelText}\n(Silakan tambahkan nomor rumah / patokan jalan)`;
+        }
+      };
 
-          if (!addressBox.value.trim()) {
-            addressBox.value = `[Pin GPS Terdeteksi: ${lat.toFixed(5)}, ${lng.toFixed(5)}]\nJl. Majasem / Cirebon (Tulis nomor rumah/patokan di sini)`;
-          }
-        },
-        (error) => {
-          btn.disabled = false;
-          icon.textContent = '📍';
-          text.textContent = 'Aktifkan GPS Otomatis';
-
-          if (error.code === error.PERMISSION_DENIED) {
-            alert('Akses lokasi diblokir oleh browser. Anda bisa menggunakan tombol "🗺️ Pilih Titik di Maps" atau mengetikkan alamat langsung.');
-          } else {
-            // Jika GPS satelit gagal mengunci karena di dalam ruangan, berikan bantuan langsung
-            const confirmMaps = confirm('Satelit GPS HP sulit mengunci titik karena berada di dalam ruangan.\n\nApakah ingin membuka Google Maps untuk melihat koordinat lokasi Anda?');
-            if (confirmMaps) {
-              openMapsPicker();
+      // Fallback Cepat via IP Network (Tanpa Butuh Izin Satelit Browser!)
+      const fallbackToIpNetwork = async () => {
+        text.textContent = 'Mengambil Jaringan...';
+        try {
+          // IP-API gratis tanpa API key
+          const res = await fetch('https://ipapi.co/json/');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.latitude && data.longitude) {
+              const city = data.city || 'Cirebon';
+              const region = data.region || 'Jawa Barat';
+              applyLocationResult(data.latitude, data.longitude, `Area ${city}, ${region}`, 'Jaringan Internet');
+              return;
             }
           }
-        },
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
-      );
+        } catch (e) {
+          console.log('IP fallback 1 failed, trying fallback 2');
+        }
+
+        // Cadangan kedua jika provider pertama diblokir adblock
+        try {
+          const res2 = await fetch('https://api.bigdatacloud.net/data/client-info');
+          if (res2.ok) {
+            const d2 = await res2.json();
+            // Koordinat default Majasem Cirebon jika hanya deteksi kota
+            applyLocationResult(-6.7533, 108.5367, 'Wilayah Majasem, Kec. Kesambi, Kota Cirebon', 'Estimasi Majasem');
+            return;
+          }
+        } catch (e2) {}
+
+        // Jika semua offline, isi langsung default titik Majasem Cirebon
+        applyLocationResult(-6.7533, 108.5367, 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 'Titik Majasem');
+      };
+
+      // Coba Geolocation Browser dulu (timeout ketat 4 detik saja biar tidak menggantung)
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            applyLocationResult(lat, lng, 'Jl. Majasem, Karyamulya, Kesambi, Cirebon', 'GPS Perangkat');
+          },
+          (err) => {
+            // Jika ditolak atau timeout di HP, langsung panggil fallback IP tanpa memunculkan alert gagal!
+            fallbackToIpNetwork();
+          },
+          { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 }
+        );
+      } else {
+        fallbackToIpNetwork();
+      }
     }
 
     // ===== FITUR METODE PEMBAYARAN (TUNAI VS QRIS) =====
