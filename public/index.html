@@ -562,10 +562,72 @@
             </div>
           </div>
 
-          <!-- Alamat Penjemputan -->
+          <!-- Alamat Penjemputan & GPS -->
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Alamat Lengkap & Patokan di Majasem/Cirebon <span class="text-rose-500">*</span></label>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Alamat Lengkap & Patokan di Majasem/Cirebon <span class="text-rose-500">*</span></label>
+              <button type="button" id="btnDetectGps" onclick="detectUserLocation()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-brand-700 text-xs font-bold transition">
+                <span id="gpsIcon">📍</span>
+                <span id="gpsText">Aktifkan Lokasi / Deteksi GPS</span>
+              </button>
+            </div>
             <textarea id="pickup_address" required rows="3" placeholder="Contoh: Jl. Majasem Indah Blok C No. 14 (Rumah pagar hitam samping Toko Sembako Bu Siti), Kel. Karyamulya, Kec. Kesambi, Cirebon" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm transition"></textarea>
+            <div id="gpsStatusBox" class="hidden mt-2 p-2.5 rounded-xl bg-cyan-50 border border-cyan-200 text-xs text-brand-900 flex items-center justify-between">
+              <span id="gpsStatusText">Lokasi berhasil terdeteksi</span>
+              <a id="gpsMapLink" href="#" target="_blank" class="text-brand-700 font-bold underline hover:text-brand-900 flex items-center gap-1">
+                Buka di Maps ↗
+              </a>
+            </div>
+            <input type="hidden" id="geo_coordinates" value="">
+          </div>
+
+          <!-- Pilihan Metode Pembayaran -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Metode Pembayaran <span class="text-rose-500">*</span></label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label class="relative flex items-center gap-3 p-3.5 rounded-xl border-2 border-brand-500 bg-brand-50/40 cursor-pointer transition payment-card" id="payCardCash">
+                <input type="radio" name="payment_method" value="Tunai / COD (Bayar Saat Jemput/Antar)" checked onchange="onPaymentChange(this.value)" class="accent-brand-600 w-4 h-4">
+                <div>
+                  <div class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>💵</span> Tunai / COD
+                  </div>
+                  <div class="text-xs text-slate-500">Bayar saat kurir jemput atau cucian diantar</div>
+                </div>
+              </label>
+
+              <label class="relative flex items-center gap-3 p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition payment-card" id="payCardQris">
+                <input type="radio" name="payment_method" value="QRIS / Transfer Digital" onchange="onPaymentChange(this.value)" class="accent-brand-600 w-4 h-4">
+                <div>
+                  <div class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>📱</span> QRIS / Transfer Bank
+                  </div>
+                  <div class="text-xs text-slate-500">Scan QRIS (GoPay, OVO, Dana, ShopeePay, BCA)</div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Box QRIS Interaktif jika dipilih -->
+            <div id="qrisDetailBox" class="hidden mt-3 p-4 rounded-2xl bg-slate-900 text-white text-xs border border-slate-800">
+              <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="bg-white p-2 rounded-xl shrink-0 text-center text-slate-900">
+                  <div class="w-28 h-28 bg-slate-100 rounded-lg flex items-center justify-center font-bold text-[10px] border border-slate-200">
+                    <div class="p-1">
+                      <div class="text-[9px] text-brand-700 font-extrabold mb-1">QRIS NASIONAL</div>
+                      <div class="w-20 h-20 bg-slate-800 rounded flex items-center justify-center text-white text-[8px] leading-tight text-center p-1">
+                        BUDI ANTIK LAUNDRY<br/>MAJASEM
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-[9px] font-bold block mt-1">NMID: ID102435...</span>
+                </div>
+                <div class="space-y-1.5 text-slate-300 text-xs">
+                  <span class="inline-block bg-cyan-400 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px] uppercase">Pembayaran Instan</span>
+                  <p class="font-semibold text-white">Scan QRIS di atas melalui m-Banking atau E-Wallet apa saja.</p>
+                  <p>Atau Transfer Bank: <strong class="text-cyan-300">BCA 1341058291</strong> a/n Budi Antik Laundry.</p>
+                  <p class="text-[11px] text-slate-400">Bukti transfer dapat langsung dilampirkan via WhatsApp setelah pesanan dikirim.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Catatan Tambahan -->
@@ -771,7 +833,9 @@
         pickup_date: document.getElementById('pickup_date').value,
         pickup_time: document.getElementById('pickup_time').value,
         pickup_address: document.getElementById('pickup_address').value,
-        pickup_notes: document.getElementById('pickup_notes').value
+        pickup_notes: document.getElementById('pickup_notes').value,
+        payment_method: document.querySelector('input[name="payment_method"]:checked')?.value || 'Tunai / COD',
+        geo_coordinates: document.getElementById('geo_coordinates').value || ''
       };
 
       try {
@@ -810,6 +874,99 @@
         submitBtn.disabled = false;
       }
     });
+
+    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (GPS GEOLOCATION) =====
+    function detectUserLocation() {
+      const btn = document.getElementById('btnDetectGps');
+      const icon = document.getElementById('gpsIcon');
+      const text = document.getElementById('gpsText');
+      const addressBox = document.getElementById('pickup_address');
+      const statusBox = document.getElementById('gpsStatusBox');
+      const statusText = document.getElementById('gpsStatusText');
+      const mapLink = document.getElementById('gpsMapLink');
+      const geoCoords = document.getElementById('geo_coordinates');
+
+      if (!navigator.geolocation) {
+        alert('Browser Anda tidak mendukung deteksi lokasi (Geolocation). Mohon ketik alamat secara manual.');
+        return;
+      }
+
+      icon.textContent = '⏳';
+      text.textContent = 'Mendeteksi Titik GPS...';
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const accuracy = Math.round(position.coords.accuracy);
+
+          geoCoords.value = `${lat},${lng}`;
+          const gmapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          mapLink.href = gmapsUrl;
+
+          icon.textContent = '📍';
+          text.textContent = 'Lokasi Terdeteksi';
+          btn.classList.remove('bg-cyan-50', 'text-brand-700');
+          btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-300');
+
+          statusBox.classList.remove('hidden');
+          statusText.textContent = `Titik GPS terdeteksi (Akurasi ±${accuracy}m): ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+          // Reverse Geocoding via OpenStreetMap Nominatim
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+            if (geoRes.ok) {
+              const geoData = await geoRes.json();
+              if (geoData && geoData.display_name) {
+                const currentVal = addressBox.value.trim();
+                const detectedAddr = geoData.display_name;
+                addressBox.value = currentVal ? `${currentVal}\n[Alamat GPS: ${detectedAddr}]` : detectedAddr;
+              }
+            }
+          } catch (e) {
+            console.log('Reverse geocoding skip:', e);
+          }
+          btn.disabled = false;
+        },
+        (error) => {
+          btn.disabled = false;
+          icon.textContent = '📍';
+          text.textContent = 'Aktifkan Lokasi / Deteksi GPS';
+          let msg = 'Gagal mendeteksi lokasi.';
+          if (error.code === error.PERMISSION_DENIED) {
+            msg = 'Izin akses lokasi ditolak. Silakan izinkan browser atau ketik alamat manual.';
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            msg = 'Sinyal GPS / lokasi tidak tersedia.';
+          } else if (error.code === error.TIMEOUT) {
+            msg = 'Waktu permintaan lokasi habis.';
+          }
+          alert(msg);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    // ===== FITUR METODE PEMBAYARAN (TUNAI VS QRIS) =====
+    function onPaymentChange(val) {
+      const qrisBox = document.getElementById('qrisDetailBox');
+      const cardCash = document.getElementById('payCardCash');
+      const cardQris = document.getElementById('payCardQris');
+
+      if (val.includes('QRIS')) {
+        qrisBox.classList.remove('hidden');
+        cardQris.classList.add('border-brand-500', 'bg-brand-50/40');
+        cardQris.classList.remove('border-slate-200', 'bg-white');
+        cardCash.classList.remove('border-brand-500', 'bg-brand-50/40');
+        cardCash.classList.add('border-slate-200', 'bg-white');
+      } else {
+        qrisBox.classList.add('hidden');
+        cardCash.classList.add('border-brand-500', 'bg-brand-50/40');
+        cardCash.classList.remove('border-slate-200', 'bg-white');
+        cardQris.classList.remove('border-brand-500', 'bg-brand-50/40');
+        cardQris.classList.add('border-slate-200', 'bg-white');
+      }
+    }
 
     // ===== FITUR BARU: KALKULATOR ESTIMASI BIAYA LAUNDRY =====
     function calculateEstimate() {

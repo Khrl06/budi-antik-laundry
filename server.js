@@ -302,7 +302,9 @@ app.post('/api/orders', async (req, res) => {
       pickup_address,
       pickup_notes,
       pickup_date,
-      pickup_time
+      pickup_time,
+      payment_method,
+      geo_coordinates
     } = req.body;
 
     if (!customer_name || !customer_phone || !pickup_address || !pickup_date || !pickup_time) {
@@ -314,6 +316,8 @@ app.post('/api/orders', async (req, res) => {
 
     const orderCode = generateOrderCode();
     const cleanPhone = customer_phone.trim();
+    const payMethod = payment_method || 'Tunai / COD';
+    const mapsLink = geo_coordinates ? `https://www.google.com/maps?q=${geo_coordinates}` : '';
 
     await insertOrder({
       order_code: orderCode,
@@ -322,7 +326,7 @@ app.post('/api/orders', async (req, res) => {
       service_type: service_type || 'Cuci Komplit Kiloan (Reguler)',
       estimated_weight: estimated_weight || 'Belum ditimbang (jemput dulu)',
       pickup_address: pickup_address.trim(),
-      pickup_notes: pickup_notes ? pickup_notes.trim() : '-',
+      pickup_notes: `${pickup_notes ? pickup_notes.trim() : '-'} | Pembayaran: ${payMethod}${mapsLink ? ' | GPS: ' + mapsLink : ''}`,
       pickup_date,
       pickup_time
     });
@@ -338,8 +342,9 @@ Detail Pesanan Anda:
 👕 *Layanan:* ${service_type || 'Cuci Komplit'}
 ⚖️ *Estimasi:* ${estimated_weight || 'Timbang saat jemput'}
 📅 *Jadwal Jemput:* ${pickup_date} (Pukul ${pickup_time})
+💳 *Metode Bayar:* ${payMethod}
 📍 *Alamat Jemput:* ${pickup_address.trim()}
-📝 *Catatan:* ${pickup_notes ? pickup_notes.trim() : '-'}
+${mapsLink ? `🗺️ *Navigasi Lokasi:* ${mapsLink}\n` : ''}📝 *Catatan:* ${pickup_notes ? pickup_notes.trim() : '-'}
 ━━━━━━━━━━━━━━━━━━━
 
 Kurir kami akan segera meluncur untuk mengambil cucian Anda sesuai jadwal. Mohon pastikan pakaian sudah siap dan nomor ini aktif.
@@ -359,9 +364,11 @@ Terdapat pesanan baru dari website:
 👕 *Layanan:* ${service_type}
 ⚖️ *Estimasi:* ${estimated_weight || '-'}
 📅 *Jemput:* ${pickup_date} jam ${pickup_time}
+💳 *Bayar:* ${payMethod}
 📍 *Alamat Jemput:* ${pickup_address.trim()}
-📝 *Catatan:* ${pickup_notes ? pickup_notes.trim() : '-'}
+${mapsLink ? `🗺️ *Titik GPS (Google Maps):* ${mapsLink}\n` : ''}📝 *Catatan:* ${pickup_notes ? pickup_notes.trim() : '-'}
 ━━━━━━━━━━━━━━━━━━━
+
 Segera atur penjemputan oleh kurir!`;
 
     const fonnteResultCust = await sendFonnteWA(cleanPhone, customerMsg);
