@@ -901,7 +901,7 @@
       }
     }
 
-    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (DUAL MODE: GPS + IP NETWORK) =====
+    // ===== FITUR BARU: DETEKSI LOKASI REAL-TIME (PRIORITAS GPS LOKAL CIREBON) =====
     async function detectUserLocation() {
       const btn = document.getElementById('btnDetectGps');
       const icon = document.getElementById('gpsIcon');
@@ -913,7 +913,7 @@
       const geoCoords = document.getElementById('geo_coordinates');
 
       icon.textContent = '⏳';
-      text.textContent = 'Mendeteksi...';
+      text.textContent = 'Mendeteksi Titik Anda...';
       btn.disabled = true;
 
       const applyLocationResult = (lat, lng, labelText, sourceName) => {
@@ -931,61 +931,46 @@
         statusText.textContent = `Lokasi terdeteksi (${sourceName}): ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 
         const curVal = addressBox.value.trim();
-        if (!curVal || curVal.includes('[Pin GPS')) {
-          addressBox.value = `[Pin Lokasi: ${lat.toFixed(4)}, ${lng.toFixed(4)}]\n${labelText}\n(Silakan tambahkan nomor rumah / patokan jalan)`;
+        if (!curVal || curVal.includes('[Pin Lokasi')) {
+          addressBox.value = `[Pin GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}]\n${labelText}\n(Tulis no rumah / patokan jalan)`;
         }
       };
 
-      // Fallback Cepat via IP Network (Tanpa Butuh Izin Satelit Browser!)
-      const fallbackToIpNetwork = async () => {
-        text.textContent = 'Mengambil Jaringan...';
-        try {
-          // IP-API gratis tanpa API key
-          const res = await fetch('https://ipapi.co/json/');
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.latitude && data.longitude) {
-              const city = data.city || 'Cirebon';
-              const region = data.region || 'Jawa Barat';
-              applyLocationResult(data.latitude, data.longitude, `Area ${city}, ${region}`, 'Jaringan Internet');
-              return;
-            }
-          }
-        } catch (e) {
-          console.log('IP fallback 1 failed, trying fallback 2');
-        }
-
-        // Cadangan kedua jika provider pertama diblokir adblock
-        try {
-          const res2 = await fetch('https://api.bigdatacloud.net/data/client-info');
-          if (res2.ok) {
-            const d2 = await res2.json();
-            // Koordinat default Majasem Cirebon jika hanya deteksi kota
-            applyLocationResult(-6.7533, 108.5367, 'Wilayah Majasem, Kec. Kesambi, Kota Cirebon', 'Estimasi Majasem');
-            return;
-          }
-        } catch (e2) {}
-
-        // Jika semua offline, isi langsung default titik Majasem Cirebon
-        applyLocationResult(-6.7533, 108.5367, 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 'Titik Majasem');
-      };
-
-      // Coba Geolocation Browser dulu (timeout ketat 4 detik saja biar tidak menggantung)
+      // 1. Coba GPS Hardware Akurat Asli HP Terlebih Dahulu (High Accuracy)
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
+          async (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            applyLocationResult(lat, lng, 'Jl. Majasem, Karyamulya, Kesambi, Cirebon', 'GPS Perangkat');
+
+            // Reverse Geocoding via OpenStreetMap agar dapat nama jalan Cirebon yang asli
+            let streetName = 'Majasem, Kec. Kesambi, Kota Cirebon';
+            try {
+              const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+              if (r.ok) {
+                const data = await r.json();
+                if (data && data.display_name) {
+                  streetName = data.display_name;
+                }
+              }
+            } catch (e) {}
+
+            applyLocationResult(lat, lng, streetName, 'GPS Perangkat');
           },
           (err) => {
-            // Jika ditolak atau timeout di HP, langsung panggil fallback IP tanpa memunculkan alert gagal!
-            fallbackToIpNetwork();
+            // 2. Jika GPS perangkat di-block/gagal, jangan pakai IP seluler (karena IP operator sering terbaca server pusat seperti Jakarta/Bali).
+            // Kunci langsung ke titik default Area Toko Majasem Cirebon!
+            applyLocationResult(
+              -6.7533, 
+              108.5367, 
+              'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 
+              'Area Majasem Cirebon'
+            );
           },
-          { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 }
+          { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
         );
       } else {
-        fallbackToIpNetwork();
+        applyLocationResult(-6.7533, 108.5367, 'Jl. Majasem Raya, Kel. Karyamulya, Kec. Kesambi, Kota Cirebon', 'Area Majasem Cirebon');
       }
     }
 
