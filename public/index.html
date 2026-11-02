@@ -63,50 +63,45 @@
   <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       <!-- Logo -->
-      <a href="#" class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <a href="#" class="flex items-center gap-3 shrink-0">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-cyan-500/20 shrink-0">
+          <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
           </svg>
         </div>
         <div>
-          <div class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+          <div class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5 whitespace-nowrap">
             Budi Antik <span class="text-brand-600">Laundry</span>
           </div>
-          <p class="text-xs font-medium text-slate-500">Majasem • Kota Cirebon</p>
+          <p class="text-[11px] font-medium text-slate-500 whitespace-nowrap">Majasem • Kota Cirebon</p>
         </div>
       </a>
 
       <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-        <a href="#keunggulan" class="hover:text-brand-600 transition">Mengapa Kami</a>
-        <a href="#layanan" class="hover:text-brand-600 transition">Layanan & Harga</a>
-        <a href="#kalkulator" class="hover:text-brand-600 transition text-brand-600 font-bold flex items-center gap-1">
+      <nav class="hidden lg:flex items-center gap-5 xl:gap-7 text-xs xl:text-sm font-semibold text-slate-600">
+        <a href="#keunggulan" class="hover:text-brand-600 transition whitespace-nowrap">Mengapa Kami</a>
+        <a href="#layanan" class="hover:text-brand-600 transition whitespace-nowrap">Layanan & Harga</a>
+        <a href="#kalkulator" class="hover:text-brand-600 transition text-brand-600 font-bold flex items-center gap-1 whitespace-nowrap">
           <span>Hitung Biaya</span>
-          <span class="text-[10px] bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full uppercase">Estimasi</span>
+          <span class="text-[9px] bg-brand-100 text-brand-700 px-1 py-0.2 rounded-full uppercase">Estimasi</span>
         </a>
-        <a href="#tracking-section" class="hover:text-brand-600 transition font-bold flex items-center gap-1">
+        <a href="#tracking-section" class="hover:text-brand-600 transition font-bold flex items-center gap-1 whitespace-nowrap">
           <span>Lacak Resi</span>
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
         </a>
-        <a href="#cara-pesan" class="hover:text-brand-600 transition">Cara Pesan</a>
-        <a href="#area" class="hover:text-brand-600 transition">Area Majasem</a>
-
+        <a href="#cara-pesan" class="hover:text-brand-600 transition whitespace-nowrap">Cara Pesan</a>
+        <a href="#area" class="hover:text-brand-600 transition whitespace-nowrap">Area Majasem</a>
       </nav>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <a href="#tracking-section" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-brand-200 text-brand-700 bg-brand-50 hover:bg-brand-100 font-bold text-xs sm:text-sm transition">
-          <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          <span>Lacak Resi</span>
-        </a>
-        <a href="https://wa.me/6285962738788?text=Halo%20Budi%20Antik%20Laundry,%20saya%20mau%20tanya%20layanan%20laundry" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition">
-          <svg class="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <a href="https://wa.me/6285962738788?text=Halo%20Budi%20Antik%20Laundry,%20saya%20mau%20tanya%20layanan%20laundry" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition">
+          <svg class="w-3.5 h-3.5 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
           <span>Chat WA</span>
         </a>
-        <a href="#order-form" class="inline-flex items-center gap-2 bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md shadow-brand-500/25 hover:opacity-95 transition">
+        <a href="#order-form" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm shadow-md shadow-brand-500/25 hover:opacity-95 transition whitespace-nowrap">
           <span>Pesan Jemput</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
       </div>
     </div>
